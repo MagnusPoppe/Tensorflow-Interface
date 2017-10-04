@@ -111,7 +111,7 @@ def autoex1(epochs=2000,num_bits=3,lrate=0.5,tint=25,showint=100):
     ann.do_training(epochs,test_interval=tint,show_interval=showint)
     ann.do_testing(scatter=True)  # Do a final round of testing to plot the hidden-layer activation vectors.
     PLT.ioff()
-    TFT.close_session(ann.current_session)
+    TFT.close_session(ann.current_session, view=False)
     return ann
 
 

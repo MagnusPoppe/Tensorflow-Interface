@@ -190,7 +190,7 @@ class Gann():
 
     def close_current_session(self):
         self.save_session_params(sess=self.current_session)
-        TFT.close_session(self.current_session, view=True)
+        TFT.close_session(self.current_session, view=False)
 
 
 # A general ann module = a layer of neurons (the output) plus its incoming weights and biases.

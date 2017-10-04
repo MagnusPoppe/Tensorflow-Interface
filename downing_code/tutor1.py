@@ -16,8 +16,8 @@ def tfex1(a,b):
     return result
 
 def tfex2(a,b):
-    x = tf.Variable(a,name='x')  # Now it's a variable with an initial value (a) and name
-    y = tf.Variable(b,name='y')
+    x = tf.Variable(a,name='x')  # Now it's a variable with an initial value (a) and name x.
+    y = tf.Variable(b,name='y')  # Now it's a variable with an initial value (b) and name y.
     z = x*y  # Create operator z
     sess = tf.Session()
     sess.run(x.initializer)  # All variables at the leaves of a function graph must be initialized
@@ -25,8 +25,6 @@ def tfex2(a,b):
     result = sess.run(z)
     sess.close()
     return result
-
-
 
 # Consolidate this session-running into a simple function.  'operators' can be a single operator or a list of ops.
 
@@ -68,7 +66,6 @@ def quickrun2(operators, grabbed_vars = None, dir='probeview'):
     sess.close()
     TFT.show_results(results[1],grabbed_vars,dir)
     return results
-
 
 def tfex5():
     w = tf.Variable(np.random.uniform(0,1,size=(3,5)),name='w')  # Init as a matrix
