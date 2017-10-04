@@ -133,10 +133,14 @@ def tfex7(n=5):
 
 def tfex8(size=5, steps=50, tvect=None,learning_rate = 0.5,showint=10):
     target = tvect if tvect else np.ones((1,size))
+
     w = tf.Variable(np.random.uniform(-.1, .1, size=(size, size)), name='weights') # weights applied to x.
     b = tf.Variable(np.zeros((1, size)), name='bias')  # bias terms
     x = tf.placeholder(tf.float64, shape=(1, size), name='input')
-    y = tf.sigmoid(tf.matmul(x,w) + b,name='out-sigmoid')  # Gather all weighted inputs, then apply activation function
+
+    # Gather all weighted inputs, then apply activation function
+    y = tf.sigmoid(tf.matmul(x,w) + b,name='out-sigmoid')
+
     error = tf.reduce_mean(tf.square(target - y))
     optimizer = tf.train.GradientDescentOptimizer(learning_rate)
     training_operator = optimizer.minimize(error)
