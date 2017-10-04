@@ -1,8 +1,10 @@
 # A little Tensorflow tutorial
 
-import tensorflow as tf
 import numpy as np
-import tflowtools as TFT
+import tensorflow as tf
+
+from downing_code import tflowtools as TFT
+
 
 def tfex1(a,b):
     x = tf.constant(a)  # Scalar constant variables

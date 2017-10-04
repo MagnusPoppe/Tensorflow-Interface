@@ -1,8 +1,11 @@
-import tensorflow as tf
-import numpy as np
 import math
+
 import matplotlib.pyplot as PLT
-import tflowtools as TFT
+import numpy as np
+import tensorflow as tf
+
+from downing_code import tflowtools as TFT
+
 
 # ******* A General Artificial Neural Network ********
 # This is the original GANN, which has been improved in the file gann.py

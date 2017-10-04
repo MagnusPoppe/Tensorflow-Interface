@@ -1,7 +1,9 @@
-import tensorflow as tf
-import numpy as np
 import matplotlib.pyplot as PLT
-import tflowtools as TFT
+import numpy as np
+import tensorflow as tf
+
+from downing_code import tflowtools as TFT
+
 
 # **** Autoencoder ****
 # We can extend the basic approach in tfex8 (tutor1.py) to handle a) a 3-layered neural network, and b) a collection
