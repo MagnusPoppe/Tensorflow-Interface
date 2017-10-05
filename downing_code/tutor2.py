@@ -25,8 +25,7 @@ class autoencoder():
         ios = 2**nh  # ios = input- and output-layer size
         self.w1 = tf.Variable(np.random.uniform(-.1,.1,size=(ios,nh)),name='Weights-1')  # first weight array
         self.w2 = tf.Variable(np.random.uniform(-.1,.1,size=(nh,ios)),name='Weights-2') # second weight array
-        self.b1 = tf.Variable(np.random.uniform(-.1,.1,size=nh),name='Bias-1')  # First bias vector
-        self.b2 = tf.Variable(np.random.uniform(-.1,.1,size=ios),name='Bias-2')  # Second bias vector
+
         self.input = tf.placeholder(tf.float64,shape=(1,ios),name='Input')
         self.target = tf.placeholder(tf.float64,shape=(1,ios),name='Target')
         self.hidden = tf.sigmoid(tf.matmul(self.input,self.w1) + self.b1,name="Hiddens")
