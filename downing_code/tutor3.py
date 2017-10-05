@@ -197,11 +197,11 @@ class Gann():
 class Gannmodule():
 
     def __init__(self,ann,index,invariable,insize,outsize):
-        self.ann = ann
-        self.insize=insize  # Number of neurons feeding into this module
-        self.outsize=outsize # Number of neurons in this module
-        self.input = invariable  # Either the gann's input variable or the upstream module's output
-        self.index = index
+        self.ann = ann              # The neural network it belongs to
+        self.insize=insize          # Number of neurons feeding into this module
+        self.outsize=outsize        # Number of neurons in this module
+        self.input = invariable     # Either the gann's input variable or the upstream module's output
+        self.index = index          #
         self.name = "Module-"+str(self.index)
         self.build()
 

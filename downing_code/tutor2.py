@@ -26,10 +26,15 @@ class autoencoder():
         self.w1 = tf.Variable(np.random.uniform(-.1,.1,size=(ios,nh)),name='Weights-1')  # first weight array
         self.w2 = tf.Variable(np.random.uniform(-.1,.1,size=(nh,ios)),name='Weights-2') # second weight array
 
+        self.b1 = tf.Variable(np.random.uniform(-.1,.1,size=nh),name='Bias-1')  # First bias vector
+        self.b2 = tf.Variable(np.random.uniform(-.1,.1,size=ios),name='Bias-2')  # Second bias vector
+
         self.input = tf.placeholder(tf.float64,shape=(1,ios),name='Input')
         self.target = tf.placeholder(tf.float64,shape=(1,ios),name='Target')
+
         self.hidden = tf.sigmoid(tf.matmul(self.input,self.w1) + self.b1,name="Hiddens")
         self.output = tf.sigmoid(tf.matmul(self.hidden,self.w2) + self.b2, name = "Outputs")
+
         self.error = tf.reduce_mean(tf.square(self.target - self.output),name='MSE')
         self.predictor = self.output  # Simple prediction runs will request the value of outputs
         # Defining the training operator
@@ -113,4 +118,5 @@ def autoex1(epochs=2000,num_bits=3,lrate=0.5,tint=25,showint=100):
     TFT.close_session(ann.current_session, view=False)
     return ann
 
-
+if __name__ == '__main__':
+    autoex1()
