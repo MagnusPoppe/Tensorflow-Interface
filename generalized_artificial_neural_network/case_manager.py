@@ -1,0 +1,3 @@
+
+class CaseManager():
+    pass
