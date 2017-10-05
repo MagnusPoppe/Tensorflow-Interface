@@ -52,7 +52,12 @@ class NetworkLayer():
 
         THE BIAS:
         The Bias defaults in the same range as the weights. Same dimensions as the
-        out-layer. The out_layer is created by using a given activation function.
+        out-layer.
+
+        THE OUT LAYER
+        the out_layer is created by using a given activation function and
+        a matrix multiplication of the in-layer and the weight-matrix. The
+        bias is added after the multiplication.
         """
 
         # Creates the weights and biases:
