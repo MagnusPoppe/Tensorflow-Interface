@@ -1,6 +1,9 @@
 import tensorflow as tf
 import numpy as np
 
+from generalized_artificial_neural_network.enums import ActivationFunction
+
+
 class NetworkLayer():
     """
     A layer inside a neural network. This consists of:
@@ -10,7 +13,7 @@ class NetworkLayer():
     4. The layer, aka. an activation function that results in a output.
     """
 
-    def __init__(self, network, placement_in_network, in_layer, in_neurons, out_neurons, activation_func=tf.nn.relu):
+    def __init__(self, network, placement_in_network, in_layer, in_neurons, out_neurons, activation_func=ActivationFunction.RECTIFIED_LINEAR):
         """
         Sets the needed values for the layer. Also builds it up.
         :param network: The neural network it belongs to a.k.a parent
@@ -31,7 +34,18 @@ class NetworkLayer():
         self.out_neurons=out_neurons # Number of neurons in this module
 
         # Activation function used on the output layer:
-        self.activation_function = activation_func
+        if activation_func == ActivationFunction.RECTIFIED_LINEAR:
+            self.activation_function = tf.nn.relu
+        elif activation_func == ActivationFunction.SIGMOID:
+            self.activation_function = tf.sigmoid
+        elif activation_func == ActivationFunction.EXPONENTIAL_LINEAR:
+            self.activation_function = tf.nn.elu
+        elif activation_func == ActivationFunction.SOFTPLUS:
+            self.activation_function = tf.nn.softplus
+        elif activation_func == ActivationFunction.SOFTSIGN:
+            self.activation_function = tf.nn.softsign
+        elif activation_func == ActivationFunction.HYPERBOLIC_TANGENT:
+            self.activation_function = tf.tanh
 
         # Other information for visualization (e.g. TensorBoard):
         self.placement_in_network = placement_in_network        # index.

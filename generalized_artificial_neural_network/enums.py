@@ -21,6 +21,10 @@ class ActivationFunction(Enum):
     SOFTSIGN = 5
     DROPOUT = 6
 
+class CostFunction(Enum):
+    MEAN_SQUARED_ERROR = 0
+    CROSS_ENTROPY = 1
+
 class Optimiser(Enum):
     """
     tf.train.Optimizer

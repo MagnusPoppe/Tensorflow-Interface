@@ -1,5 +1,6 @@
 import downing_code.tflowtools as TFT
 from generalized_artificial_neural_network.case_manager import CaseManager
+from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
 from generalized_artificial_neural_network.neural_network import NeuralNetwork
 
 import tensorflow as tf
@@ -9,15 +10,11 @@ import matplotlib.pyplot as PLT
 
 class NetworkController():
 
-    def __init__(self, configuration):
-
+    def __init__(self, configuration: NetworkConfiguration):
         self.casemanager = configuration.manager
         self.net = NeuralNetwork(configuration)
-
-
         self.validation_history = []
         self.validation_interval = configuration.validation_interval
-
 
     def do_training(self,sess,cases,epochs=100,continued=False):
         if not(continued): self.error_history = []
@@ -90,12 +87,12 @@ class NetworkController():
         print("\n" + msg, end="\n")
         fig_index = 0
         for i, v in enumerate(grabbed_vals):
-            if names: print("   " + names[i] + " = ", end="\n")
+            if names: print("   " + names[i] + " = ", end="")
             if type(v) == np.ndarray and len(v.shape) > 1: # If v is a matrix, use hinton plotting
                 TFT.hinton_plot(v,fig=self.net.grabvar_figures[fig_index],title= names[i]+ ' at step '+ str(step))
                 fig_index += 1
             else:
-                print(v, end="\n\n")
+                print(v, end="\n")
 
     def run(self,epochs=100,sess=None,continued=False):
         PLT.ion()
@@ -142,5 +139,5 @@ class NetworkController():
 
     def close_current_session(self):
         self.save_session_params(sess=self.current_session)
-        TFT.close_session(self.current_session, view=True)
+        TFT.close_session(self.current_session, view=False)
 

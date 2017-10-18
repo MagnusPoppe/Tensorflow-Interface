@@ -1,18 +1,24 @@
 import tensorflow as tf
 import matplotlib.pyplot as PLT
 
+from generalized_artificial_neural_network.enums import CostFunction
 from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
 from generalized_artificial_neural_network.network_layer import NetworkLayer
 
 
 class NeuralNetwork():
 
-    def __init__(self, configuration:NetworkConfiguration):
+    def __init__(self, configuration: NetworkConfiguration):
 
         # Specifications of the network:
         self.layer_dimensions = configuration.network_dimensions   # Sizes of each layer of neurons
         self.minibatch_size = configuration.mbs
         self.modules = []
+
+        # Cost function:
+        self.cost_function = configuration.cost_function
+
+        # Activation functions:
         self.softmax_outputs = configuration.softmax
         self.hidden_layer_activation_function = configuration.hidden_layer_activation_function
         self.output_layer_activation_function = configuration.output_layer_activaiton_function
@@ -63,7 +69,8 @@ class NeuralNetwork():
 
         # Build all of the modules
         for placement, out_layer_size in enumerate(self.layer_dimensions[1:]):
-            layer = NetworkLayer(self, placement, in_layer, in_layer_size, out_layer_size)
+            activation = self.hidden_layer_activation_function if placement < len(self.layer_dimensions[1:])-1 else self.output_layer_activation_function
+            layer = NetworkLayer(self, placement, in_layer, in_layer_size, out_layer_size, activation)
 
             # Defining the in-layer for the next level in the neural network:
             in_layer = layer.out_layer
@@ -72,21 +79,19 @@ class NeuralNetwork():
         # After the network has been built, we store the last layer as output layer:
         self.output = layer.out_layer
 
-        ### DIGRESJON: WIKIPEDIA OM SOFTMAX:
-        # I matematikk er softmax - funksjonen, eller den normaliserte eksponentielle funksjonen[1]:
-        # 198, en generalisering av den logistiske funksjonen, som «skviser sammen» en K - dimensjonal
-        # vektor z {\displaystyle \mathbf {z}} av vilkårlige reelle verdier til en
-        # K - dimensjonal vektor σ (     z ) {\displaystyle \sigma(\mathbf {z} )} av reelle verdier
-        # i intervallet(0, 1) med sum 1. Funksjonen er gitt
-        if self.softmax_outputs: self.output = tf.nn.softmax(self.output)
+        if self.softmax_outputs:
+            self.output = tf.nn.softmax(self.output)
 
         # Adding a target value for the net. This is a placeholder. The value comes from the datasets.
         self.target = tf.placeholder(tf.float64,shape=(None,layer.out_neurons),name='Target')
         self.configure_learning()
 
     def configure_learning(self):
-        # Function to create calculate loss:
-        self.error = tf.reduce_mean(tf.square(self.target - self.output),name='MSE')
+        # Cost Function used to create calculate loss/error:
+        if self.cost_function == CostFunction.MEAN_SQUARED_ERROR:
+            self.error = tf.reduce_mean(tf.square(self.target - self.output),name='ERROR')
+        elif self.cost_function == CostFunction.CROSS_ENTROPY:
+            self.error = tf.reduce_mean(-tf.reduce_sum(self.output * tf.log(self.target), reduction_indices=[1], name='ERROR'))
 
         # Predictor. Denne hjelper for å hente ut verdier under testing ved å hente verdier fra output:
         self.predictor = self.output
