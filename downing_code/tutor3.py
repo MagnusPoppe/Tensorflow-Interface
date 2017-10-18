@@ -133,7 +133,7 @@ class Gann():
         return results[0], results[1], sess
 
     def display_grabvars(self, grabbed_vals, grabbed_vars,step=1):
-        names = [x.name for x in grabbed_vars];
+        names = [x.name for x in grabbed_vars]
         msg = "Grabbed Variables at Step " + str(step)
         print("\n" + msg, end="\n")
         fig_index = 0
@@ -190,7 +190,7 @@ class Gann():
 
     def close_current_session(self):
         self.save_session_params(sess=self.current_session)
-        TFT.close_session(self.current_session, view=False)
+        TFT.close_session(self.current_session, view=True)
 
 
 # A general ann module = a layer of neurons (the output) plus its incoming weights and biases.
@@ -281,4 +281,5 @@ def autoex(epochs=300,nbits=4,lrate=0.03,showint=100,mbs=None,vfrac=0.1,tfrac=0.
     ann.runmore(epochs*2)
     return ann
 
-
+if __name__ == '__main__':
+    autoex()

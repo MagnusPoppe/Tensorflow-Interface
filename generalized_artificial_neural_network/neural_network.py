@@ -1,35 +1,33 @@
 import tensorflow as tf
 import matplotlib.pyplot as PLT
 
+from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
 from generalized_artificial_neural_network.network_layer import NetworkLayer
 
 
 class NeuralNetwork():
 
-    def __init__(self, layer_size, manager, learning_rate=.1,
-                 display_interval=None, mbs=10, softmax=False,
-                 hidden_layer_activation_function=tf.nn.relu, output_layer_activaiton_function=tf.nn.relu
-         ):
+    def __init__(self, configuration:NetworkConfiguration):
 
         # Specifications of the network:
-        self.layer_dimensions = layer_size   # Sizes of each layer of neurons
-        self.minibatch_size = mbs
+        self.layer_dimensions = configuration.network_dimensions   # Sizes of each layer of neurons
+        self.minibatch_size = configuration.mbs
         self.modules = []
-        self.softmax_outputs = softmax
-        self.hidden_layer_activation_function = hidden_layer_activation_function
-        self.output_layer_activation_function = output_layer_activaiton_function
+        self.softmax_outputs = configuration.softmax
+        self.hidden_layer_activation_function = configuration.hidden_layer_activation_function
+        self.output_layer_activation_function = configuration.output_layer_activaiton_function
 
         # Learning
-        self.learning_rate = learning_rate
+        self.learning_rate = configuration.learning_rate
 
         # Case management:
-        self.caseman = manager
+        self.caseman = configuration.manager
 
         # Monitored values:
         self.grabvars = []  # Variables to be monitored (by gann code) during a run.
 
         # Visuals
-        self.show_interval = display_interval # Frequency of showing grabbed variables
+        self.show_interval = configuration.display_interval # Frequency of showing grabbed variables
         self.grabvar_figures = [] # One matplotlib figure for each grabvar
 
         # Other information:
@@ -40,7 +38,7 @@ class NeuralNetwork():
 
     def gen_probe(self, module_index, type, spec):
         """ Probed variables are to be displayed in the Tensorboard. """
-        self.modules[module_index].gen_probe(type,spec)
+        self.modules[module_index].generate_probe(type,spec)
 
     # Grabvars are displayed by my own code, so I have more control over the display format.  Each
     # grabvar gets its own matplotlib figure in which to display its value.

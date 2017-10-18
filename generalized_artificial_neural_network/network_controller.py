@@ -9,18 +9,14 @@ import matplotlib.pyplot as PLT
 
 class NetworkController():
 
-    def __init__(self, network_dimensions, manager, learning_rate, display_interval=None, mbs=10,
-                 validation_interval=None, softmax=False,
-                 hidden_layer_activation_function=tf.nn.relu, output_layer_activaiton_function=tf.nn.relu
-             ):
+    def __init__(self, configuration):
 
-        self.casemanager = CaseManager()
-        self.net = NeuralNetwork(network_dimensions, self.casemanager, display_interval, mbs,
-                                 softmax, hidden_layer_activation_function, output_layer_activaiton_function)
+        self.casemanager = configuration.manager
+        self.net = NeuralNetwork(configuration)
 
 
         self.validation_history = []
-        self.validation_interval = validation_interval
+        self.validation_interval = configuration.validation_interval
 
 
     def do_training(self,sess,cases,epochs=100,continued=False):
@@ -146,4 +142,5 @@ class NetworkController():
 
     def close_current_session(self):
         self.save_session_params(sess=self.current_session)
-        TFT.close_session(self.current_session, view=False)
+        TFT.close_session(self.current_session, view=True)
+
