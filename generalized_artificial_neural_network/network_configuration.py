@@ -20,47 +20,75 @@ class NetworkConfiguration:
     4.  Use better optimizers(AdamOptimizer, AdagradOptimizer) instead of
         GradientDescentOptimizer, or use momentum for faster convergence,
     """
-
     def __init__(self, file=None):
-        if file:
-            self._import()
-        else:
-            self.network_dimensions = None
-            self.manager = None
-            self.learning_rate = 0.1
-            self.display_interval = None
-            self.mbs = 10
-            self.validation_interval = None
-            self.softmax = False
-            self.hidden_layer_activation_function = ActivationFunction.RECTIFIED_LINEAR
-            self.output_layer_activaiton_function = ActivationFunction.SIGMOID
-            self.cost_function = CostFunction.MEAN_SQUARED_ERROR
-
-    def _import(self):
         with open("configurations/exported.json", "r") as f:
             input = json.loads(" ".join(f.readlines()))
 
-        self.network_dimensions = input['network_dimensions']
-        self.learning_rate = input['learning_rate' ]
-        self.display_interval = input['display_interval']
-        self.mbs = input['mini-batch-size']
-        self.validation_interval = input['validation_test_interval']
-        self.softmax = input['use_softmax']
-        self.hidden_layer_activation_function = ActivationFunction(input['hidden_layer_activation_function'])
-        self.output_layer_activaiton_function = ActivationFunction(input['output_layer_activaiton_function'])
-        self.cost_function = CostFunction(input['cost_function'])
+        # DATASET:
+        self.dataset                    = input["dataset"]["name"]
+        self.total_case_fraction        = input["dataset"]["total_case_fraction"]
+        self.steps_per_minibatch        = input["dataset"]["steps_per_minibatch"]
+        self.validation_fraction        = input["dataset"]["validation_fraction"]
+        self.test_fraction              = input["dataset"]["test_fraction"]
 
-    def _export(self):
-        output = {
-            'network_dimensions': self.network_dimensions,
-            'learning_rate': self.learning_rate,
-            'display_interval': self.display_interval,
-            'mini-batch-size' : self.mbs,
-            'validation_test_interval': self.validation_interval,
-            'use_softmax': self.softmax,
-            'hidden_layer_activation_function': self.hidden_layer_activation_function.value,
-            'output_layer_activaiton_function': self.output_layer_activaiton_function.value,
-            'cost_function': self.cost_function.value
-        }
+        # NETWORK CONFIGURATION:
+        self.network_dimensions         = input["network_configuration"]['network_dimensions']
+        self.learning_rate              = input["network_configuration"]['learning_rate' ]
+        self.validation_interval        = input["network_configuration"]['validation_test_interval']
+        self.softmax                    = input["network_configuration"]['use_softmax']
+        self.lower_bound_weight_range   = input["network_configuration"]['weight_range']['lower']
+        self.upper_bound_weight_range   = input["network_configuration"]['weight_range']['upper']
+        self.hidden_activation          = ActivationFunction(input["network_configuration"]['hidden_activation'])
+        self.output_activation          = ActivationFunction(input["network_configuration"]['output_activation'])
+        self.cost_function              = CostFunction(input["network_configuration"]['cost_function'])
+
+        # RUN CONFIGURATION
+        self.mini_batch_size            = input["run_configuration"]["mini-batch-size"]
+        self.map_batch_size             = input["run_configuration"]["map-batch-size"]
+
+        # VISUALISATION
+        self.display_interval           = input["visualisation"]["display_interval"]
+        self.map_layers                 = input["visualisation"]["map_layers"]
+        self.map_dendrograms            = input["visualisation"]["map_dendrograms"]
+        self.display_weights            = input["visualisation"]["display_weights"]
+        self.display_biases             = input["visualisation"]["display_biases"]
+
+    def export(self):
+        """ Creates a dictionary out of all the values and then dumps to json. """
         with open("configurations/exported.json", "w") as f:
-            f.write(json.dumps(output))
+            f.write( json.dumps( self.to_dict()) )
+
+    def to_dict(self):
+        return {
+            "dataset": {
+                "name": self.dataset,
+                "total_case_fraction": self.total_case_fraction,
+                "steps_per_minibatch": self.steps_per_minibatch,
+                "validation_fraction": self.validation_fraction,
+                "test_fraction": self.test_fraction
+            },
+            "network_configuration": {
+                'network_dimensions': self.network_dimensions,
+                'learning_rate': self.learning_rate,
+                'weight_range': {
+                    'lower': self.lower_bound_weight_range,
+                    'upper': self.upper_bound_weight_range
+                },
+                'validation_test_interval': self.validation_interval,
+                'use_softmax': self.softmax,
+                'hidden_activation': self.hidden_activation.value,
+                'output_activation': self.output_activation.value,
+                'cost_function': self.cost_function.value
+            },
+            "run_configuration": {
+                "mini-batch-size": self.mini_batch_size,
+                "map-batch-size": self.map_batch_size,
+            },
+            "visualisation": {
+                'display_interval': self.display_interval,
+                "map_layers": self.map_layers,
+                "map_dendrograms": self.map_dendrograms,
+                "display_weights": self.display_weights,
+                "display_biases": self.display_biases
+            }
+        }

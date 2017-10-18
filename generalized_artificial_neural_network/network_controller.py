@@ -87,12 +87,12 @@ class NetworkController():
         print("\n" + msg, end="\n")
         fig_index = 0
         for i, v in enumerate(grabbed_vals):
-            if names: print("   " + names[i] + " = ", end="")
+            if names: print("\t" + names[i] + ": ", end="")
             if type(v) == np.ndarray and len(v.shape) > 1: # If v is a matrix, use hinton plotting
                 TFT.hinton_plot(v,fig=self.net.grabvar_figures[fig_index],title= names[i]+ ' at step '+ str(step))
                 fig_index += 1
             else:
-                print(v, end="\n")
+                print(v, end=('\n'))
 
     def run(self,epochs=100,sess=None,continued=False):
         PLT.ion()

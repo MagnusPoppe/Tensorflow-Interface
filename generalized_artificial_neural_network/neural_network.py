@@ -12,7 +12,7 @@ class NeuralNetwork():
 
         # Specifications of the network:
         self.layer_dimensions = configuration.network_dimensions   # Sizes of each layer of neurons
-        self.minibatch_size = configuration.mbs
+        self.minibatch_size = configuration.mini_batch_size
         self.modules = []
 
         # Cost function:
@@ -20,8 +20,8 @@ class NeuralNetwork():
 
         # Activation functions:
         self.softmax_outputs = configuration.softmax
-        self.hidden_layer_activation_function = configuration.hidden_layer_activation_function
-        self.output_layer_activation_function = configuration.output_layer_activaiton_function
+        self.hidden_layer_activation_function = configuration.hidden_activation
+        self.output_layer_activation_function = configuration.output_activation
 
         # Learning
         self.learning_rate = configuration.learning_rate
