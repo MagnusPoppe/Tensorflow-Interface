@@ -1,5 +1,6 @@
 import json
 
+from generalized_artificial_neural_network.case_manager import CaseManager
 from generalized_artificial_neural_network.enums import ActivationFunction, CostFunction
 
 
@@ -52,6 +53,9 @@ class NetworkConfiguration:
         self.map_dendrograms            = input["visualisation"]["map_dendrograms"]
         self.display_weights            = input["visualisation"]["display_weights"]
         self.display_biases             = input["visualisation"]["display_biases"]
+
+        # SETTING CASEMANAGER:
+        self.manager = CaseManager(self.dataset, self.mini_batch_size, self.validation_fraction, self.test_fraction)
 
     def export(self):
         """ Creates a dictionary out of all the values and then dumps to json. """

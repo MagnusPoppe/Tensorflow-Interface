@@ -69,7 +69,13 @@ class NeuralNetwork():
 
         # Build all of the modules
         for placement, out_layer_size in enumerate(self.layer_dimensions[1:]):
-            activation = self.hidden_layer_activation_function if placement < len(self.layer_dimensions[1:])-1 else self.output_layer_activation_function
+            # Choosing the correct activation function:
+            if placement < len(self.layer_dimensions) - 1:
+                activation = self.hidden_layer_activation_function
+            else:
+                activation = self.output_layer_activation_function
+
+            # Creating the hidden layer:
             layer = NetworkLayer(self, placement, in_layer, in_layer_size, out_layer_size, activation)
 
             # Defining the in-layer for the next level in the neural network:
