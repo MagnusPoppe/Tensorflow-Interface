@@ -19,13 +19,19 @@ class NetworkController():
     def do_training(self,sess,cases,epochs=100,continued=False):
         if not(continued): self.error_history = []
         for i in range(epochs):
-            error = 0; step = self.net.global_training_step + i
+
+            error = 0;
+            step = self.net.global_training_step + i
             gvars = [self.net.error] + self.net.grabvars
-            mbs = self.net.minibatch_size; ncases = len(cases); nmb = math.ceil(ncases/mbs)
+            mbs = self.net.minibatch_size
+            ncases = len(cases)
+            nmb = math.ceil(ncases/mbs)
+
             for cstart in range(0,ncases,mbs):  # Loop through cases, one minibatch at a time.
                 cend = min(ncases,cstart+mbs)
                 minibatch = cases[cstart:cend]
-                inputs = [c[0] for c in minibatch]; targets = [c[1] for c in minibatch]
+                inputs = [c[0] for c in minibatch];
+                targets = [c[1] for c in minibatch]
                 feeder = {self.net.input: inputs, self.net.target: targets}
                 _,grabvals,_ = self.run_one_step([self.net.trainer],gvars,self.net.probes,session=sess,
                                          feed_dict=feeder,step=step,show_interval=self.net.show_interval)

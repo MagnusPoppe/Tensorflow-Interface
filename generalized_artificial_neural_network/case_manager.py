@@ -10,7 +10,7 @@ class CaseManager():
         self.test_fraction = test_fraction
         self.training_fraction = 1 - (validation_fraction + test_fraction)
 
-        self.generate_cases()
+        self.cases = self.generate_cases()
 
         if 0 < case_fraction < 1:
             self.total_case_fraction = case_fraction * len(self.cases)
@@ -19,10 +19,14 @@ class CaseManager():
         self.organize_cases()
 
     def get_case_function(self, case, minibatch_size):
-        if case == "one-hot-bit": return lambda : TFT.gen_all_one_hot_cases(2 ** 4)
+        if case == "one-hot-bit": return lambda : TFT.gen_all_one_hot_cases(len=2 ** 4)
+        if case == "parity": return lambda : TFT.gen_all_parity_cases(num_bits=10, double=True)
+        if case == "dense": return lambda : TFT.gen_dense_autoencoder_cases(1000, size=10, dr=(0.4, 0.7))
+        if case == "bit-counter": return lambda : TFT.gen_vector_count_cases(num=500, size=15)
+        if case == "segment-counter": return lambda : TFT.gen_segmented_vector_cases(count=1000, minsegs=0, maxsegs=8,vectorlen=25)
 
         # TODO: Implement the remaining datasets...
-        if case == "vine quality": return None
+        if case == "wine quality": return None
         if case == "glass": return None
         if case == "yeast": return None
         if case == "mnist": return None
@@ -31,8 +35,9 @@ class CaseManager():
         if case == "hackers choice": return None
 
 
-    def generate_cases(self):
-        self.cases = self.casefunc()  # Run the case generator.  Case = [input-vector, target-vector]
+    def generate_cases(self) -> list:
+        """ Run the case generator.  Case = [input-vector, target-vector] """
+        return self.casefunc()
 
     def organize_cases(self):
         ca = np.array(self.cases[:int(self.total_case_fraction)])

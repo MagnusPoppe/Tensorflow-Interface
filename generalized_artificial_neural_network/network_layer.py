@@ -13,7 +13,7 @@ class NetworkLayer():
     4. The layer, aka. an activation function that results in a output.
     """
 
-    def __init__(self, network, placement_in_network, in_layer, in_neurons, out_neurons, activation_func=ActivationFunction.RECTIFIED_LINEAR):
+    def __init__(self, network, placement_in_network, in_layer, in_neurons, out_neurons, upper, lower, activation_func=ActivationFunction.RECTIFIED_LINEAR):
         """
         Sets the needed values for the layer. Also builds it up.
         :param network: The neural network it belongs to a.k.a parent
@@ -52,9 +52,9 @@ class NetworkLayer():
         self.name = "Module-"+str(self.placement_in_network)    # name for visuals.
 
         # Building network:
-        self.build()
+        self.build(lower, upper)
 
-    def build(self):
+    def build(self, lower, upper):
         """
         Builds up the network.
 
@@ -76,12 +76,12 @@ class NetworkLayer():
 
         # Creates the weights and biases:
         self.weights = tf.Variable(
-            np.random.uniform(-.1, .1, size = (self.in_neurons,self.out_neurons)),
+            np.random.uniform(lower, upper, size = (self.in_neurons,self.out_neurons)),
             name            =  self.name+'-wgt',
             trainable       = True
         )
         self.biases  = tf.Variable(
-            np.random.uniform(-.1, .1, size = self.out_neurons),
+            np.random.uniform(lower, upper, size = self.out_neurons),
             name            = self.name+'-bias',
             trainable       = True
         )

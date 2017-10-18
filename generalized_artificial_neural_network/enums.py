@@ -13,7 +13,7 @@ class ActivationFunction(Enum):
     tf.sigmoid
     tf.tanh
     """
-    SIGMOID = 2
+    SIGMOID = 0
     RECTIFIED_LINEAR = 1
     EXPONENTIAL_LINEAR = 2
     HYPERBOLIC_TANGENT = 3
@@ -25,7 +25,7 @@ class CostFunction(Enum):
     MEAN_SQUARED_ERROR = 0
     CROSS_ENTROPY = 1
 
-class Optimiser(Enum):
+class Optimizer(Enum):
     """
     tf.train.Optimizer
     tf.train.GradientDescentOptimizer

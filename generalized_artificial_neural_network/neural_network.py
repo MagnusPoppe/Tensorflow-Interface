@@ -1,7 +1,7 @@
 import tensorflow as tf
 import matplotlib.pyplot as PLT
 
-from generalized_artificial_neural_network.enums import CostFunction
+from generalized_artificial_neural_network.enums import CostFunction, Optimizer
 from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
 from generalized_artificial_neural_network.network_layer import NetworkLayer
 
@@ -13,6 +13,8 @@ class NeuralNetwork():
         # Specifications of the network:
         self.layer_dimensions = configuration.network_dimensions   # Sizes of each layer of neurons
         self.minibatch_size = configuration.mini_batch_size
+        self.lower_bound_weight_value = configuration.lower_bound_weight_range
+        self.upper_bound_weight_value = configuration.upper_bound_weight_range
         self.modules = []
 
         # Cost function:
@@ -25,6 +27,7 @@ class NeuralNetwork():
 
         # Learning
         self.learning_rate = configuration.learning_rate
+        self.optimizer_function = configuration.optimizer
 
         # Case management:
         self.caseman = configuration.manager
@@ -37,7 +40,8 @@ class NeuralNetwork():
         self.grabvar_figures = [] # One matplotlib figure for each grabvar
 
         # Other information:
-        self.global_training_step = 0 # Enables coherent data-storage during extra training runs (see runmore).
+        # Enables coherent data-storage during extra training runs (see runmore).
+        self.global_training_step = configuration.steps_per_minibatch
 
         # Building the network:
         self.build()
@@ -76,7 +80,15 @@ class NeuralNetwork():
                 activation = self.output_layer_activation_function
 
             # Creating the hidden layer:
-            layer = NetworkLayer(self, placement, in_layer, in_layer_size, out_layer_size, activation)
+            layer = NetworkLayer(self,
+                 placement,
+                 in_layer,
+                 in_layer_size,
+                 out_layer_size,
+                 self.lower_bound_weight_value,
+                 self.upper_bound_weight_value,
+                 activation
+             )
 
             # Defining the in-layer for the next level in the neural network:
             in_layer = layer.out_layer
@@ -93,15 +105,47 @@ class NeuralNetwork():
         self.configure_learning()
 
     def configure_learning(self):
-        # Cost Function used to create calculate loss/error:
-        if self.cost_function == CostFunction.MEAN_SQUARED_ERROR:
-            self.error = tf.reduce_mean(tf.square(self.target - self.output),name='ERROR')
-        elif self.cost_function == CostFunction.CROSS_ENTROPY:
-            self.error = tf.reduce_mean(-tf.reduce_sum(self.output * tf.log(self.target), reduction_indices=[1], name='ERROR'))
+        self.error = self.select_cost_function()
 
         # Predictor. Denne hjelper for å hente ut verdier under testing ved å hente verdier fra output:
         self.predictor = self.output
 
         # Defining the training operator
-        optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
+        optimizer = self.select_optimizer()
         self.trainer = optimizer.minimize(self.error,name='Backpropagation')
+
+    def select_optimizer(self) -> tf.train:
+        if self.optimizer_function == Optimizer.GRADIENT_DECENT:
+            return tf.train.GradientDescentOptimizer(self.learning_rate)
+        if self.optimizer_function == Optimizer.ADADELTA:
+            return tf.train.AdadeltaOptimizer(self.learning_rate)
+        if self.optimizer_function == Optimizer.ADAGRAD:
+            return tf.train.AdagradOptimizer(self.learning_rate)
+        if self.optimizer_function == Optimizer.ADAGRADDA:
+            return tf.train.AdagradDAOptimizer(self.learning_rate, self.global_training_step)
+
+        if self.optimizer_function == Optimizer.MOMENTUM:
+            pass # todo: Not yet implemented.
+            # tf.train.MomentumOptimizer
+        if self.optimizer_function == Optimizer.MOMENTUM:
+            pass  # todo: Not yet implemented.
+            # tf.train.AdamOptimizer
+        if self.optimizer_function == Optimizer.FTRL:
+            pass  # todo: Not yet implemented.
+            # tf.train.FtrlOptimizer
+        if self.optimizer_function == Optimizer.PROXIMAL_GRADIENT_DECENT:
+            pass  # todo: Not yet implemented.
+            # tf.train.ProximalGradientDescentOptimizer
+        if self.optimizer_function == Optimizer.PROXIMAL_ADAGRAD:
+            pass  # todo: Not yet implemented.
+            # tf.train.ProximalAdagradOptimizer
+        if self.optimizer_function == Optimizer.RMS_PROP:
+            pass  # todo: Not yet implemented.
+            # tf.train.RMSPropOptimizer
+
+    def select_cost_function(self):
+        # Cost Function used to create calculate loss/error:
+        if self.cost_function == CostFunction.MEAN_SQUARED_ERROR:
+            return tf.reduce_mean(tf.square(self.target - self.output),name='ERROR')
+        if self.cost_function == CostFunction.CROSS_ENTROPY:
+            return tf.reduce_mean(-tf.reduce_sum(self.output *tf.log(self.target), reduction_indices=[1], name='ERROR'))
