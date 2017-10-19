@@ -42,8 +42,9 @@ class NetworkController():
                                   title="", fig=not(continued))
         self.net.global_training_step += epochs
 
-    def do_testing(self,sess,cases,msg='Testing'):
-        inputs = [c[0] for c in cases]; targets = [c[1] for c in cases]
+    def do_testing(self,sess, cases, msg='Testing'):
+        inputs = [c[0] for c in cases]
+        targets = [c[1] for c in cases]
         feeder = {self.net.input: inputs, self.net.target: targets}
         error, grabvals, _ = self.run_one_step(self.net.error, self.net.grabvars, self.net.probes, session=sess,
                                            feed_dict=feeder,  show_interval=self.net.show_interval)

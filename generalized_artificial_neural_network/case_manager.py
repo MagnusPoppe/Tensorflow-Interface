@@ -13,7 +13,7 @@ class CaseManager():
         self.cases = self.generate_cases()
 
         if 0 < case_fraction <= 1:
-            self.total_case_fraction = case_fraction * len(self.cases[0])
+            self.total_case_fraction = case_fraction * len(self.cases)
         else: raise ValueError("case fraction needs to be between 0 and 1.")
 
         self.organize_cases()
@@ -44,8 +44,8 @@ class CaseManager():
     def organize_cases(self):
         ca = np.array(self.cases[:int(self.total_case_fraction)])
         np.random.shuffle(ca) # Randomly shuffle all cases
-        separator1 = round(len(self.cases) * self.training_fraction)
-        separator2 = separator1 + round(len(self.cases)*self.validation_fraction)
+        separator1 = round(int(self.total_case_fraction) * self.training_fraction)
+        separator2 = separator1 + round(int(self.total_case_fraction)*self.validation_fraction)
         self.training_cases = ca[0:separator1]
         self.validation_cases = ca[separator1:separator2]
         self.testing_cases = ca[separator2:]

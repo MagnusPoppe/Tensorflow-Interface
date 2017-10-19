@@ -34,9 +34,9 @@
       ]
    },
    "dataset":{
-      "validation_fraction":0.1,
-      "steps_per_minibatch":0,
-      "test_fraction":0.1,
+      "validation_fraction":0.2,
+      "steps_per_minibatch":1,
+      "test_fraction":0.2,
       "name":"one-hot-bit",
       "total_case_fraction":1.0
    }
