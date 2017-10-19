@@ -1,22 +1,22 @@
 {
    "network_configuration":{
       "optimizer":0,
-      "hidden_activation":0,
-      "learning_rate":0.075,
+      "hidden_activation":3,
+      "output_activation":3,
+      "learning_rate":0.0500,
       "validation_test_interval":100,
-      "output_activation":1,
       "use_softmax":false,
       "network_dimensions":[ 10, 5, 10 ],
       "cost_function":0,
       "weight_range":{
-         "upper":0.5,
-         "lower":0
+         "upper": 1,
+         "lower": -1
       }
    },
    "run_configuration":{
       "map-batch-size":1,
       "mini-batch-size":16,
-      "epochs":300
+      "epochs":1000
    },
    "visualisation":{
       "display_biases":false,
