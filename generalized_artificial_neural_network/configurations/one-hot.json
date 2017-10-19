@@ -1,7 +1,7 @@
 {
    "network_configuration":{
-      "optimizer":1,
-      "hidden_activation":2,
+      "optimizer":0,
+      "hidden_activation":0,
       "learning_rate":0.03,
       "validation_test_interval":100,
       "output_activation":1,

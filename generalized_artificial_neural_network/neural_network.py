@@ -97,7 +97,7 @@ class NeuralNetwork():
         # After the network has been built, we store the last layer as output layer:
         self.output = layer.out_layer
 
-        if self.softmax_outputs:
+        if self.softmax_outputs and self.cost_function != CostFunction.CROSS_ENTROPY:
             self.output = tf.nn.softmax(self.output)
 
         # Adding a target value for the net. This is a placeholder. The value comes from the datasets.
@@ -146,6 +146,10 @@ class NeuralNetwork():
     def select_cost_function(self):
         # Cost Function used to create calculate loss/error:
         if self.cost_function == CostFunction.MEAN_SQUARED_ERROR:
-            return tf.reduce_mean(tf.square(self.target - self.output),name='ERROR')
+            return tf.reduce_mean(tf.square(self.target - self.output),name='MSE')
         if self.cost_function == CostFunction.CROSS_ENTROPY:
-            return tf.reduce_mean(-tf.reduce_sum(self.output *tf.log(self.target), reduction_indices=[1], name='ERROR'))
+            # Tensorflow implementation of cross-entropy
+            return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.output, labels=self.target),name="CROSS-ENTROPY")
+
+            # My implementation of cross-entropy (not as stable as tensorflow's algorithm)
+            # return - tf.reduce_mean(tf.reduce_sum(self.target * tf.log(tf.nn.softmax(self.output)), [1]) , name='CROSS-ENTROPY')

@@ -2,38 +2,34 @@
    "network_configuration":{
       "optimizer":0,
       "hidden_activation":1,
-      "output_activation":1,
-      "learning_rate":0.0095,
+      "learning_rate":0.1,
       "validation_test_interval":100,
-      "use_softmax":true,
-      "network_dimensions":[ 10, 5, 3, 2 ],
+      "output_activation":0,
+      "use_softmax":false,
+      "network_dimensions":[ 576, 20, 10, 1 ],
       "cost_function":0,
       "weight_range":{
-         "upper":1,
-         "lower":-1
+         "upper":0.1,
+         "lower":-0.1
       }
    },
    "run_configuration":{
       "map-batch-size":1,
       "mini-batch-size":20,
-      "epochs":1000
+      "epochs":1
    },
    "visualisation":{
       "display_biases":false,
       "display_weights":false,
       "map_dendrograms":false,
       "display_interval":100,
-      "map_layers":[
-         1,
-         2,
-         3
-      ]
+      "map_layers":[ 1,  2,  3 ]
    },
    "dataset":{
       "validation_fraction":0.1,
-      "steps_per_minibatch":1,
+      "steps_per_minibatch":0,
       "test_fraction":0.1,
-      "name":"parity",
+      "name":"mnist",
       "total_case_fraction":1.0
    }
 }

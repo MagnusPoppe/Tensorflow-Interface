@@ -26,8 +26,8 @@ if __name__ == '__main__':
     c = NetworkConfiguration(os.path.join("configurations", file))
     ann = NetworkController(c)
 
-    ann.net.gen_probe(0, 'wgt', ('hist', 'avg'))  # Plot a histogram and avg of the incoming weights to module 0.
-    ann.net.gen_probe(1, 'out', ('avg', 'max'))  # Plot average and max value of module 1's output vector
+    # ann.net.gen_probe(0, 'wgt', ('hist', 'avg'))  # Plot a histogram and avg of the incoming weights to module 0.
+    # ann.net.gen_probe(1, 'out', ('avg', 'max'))  # Plot average and max value of module 1's output vector
     ann.net.add_grabvar(0, 'wgt')  # Add a grabvar (to be displayed in its own matplotlib window).
     ann.run(c.epochs)
     ann.runmore(c.epochs * 2)

@@ -12,8 +12,8 @@ class CaseManager():
 
         self.cases = self.generate_cases()
 
-        if 0 < case_fraction < 1:
-            self.total_case_fraction = case_fraction * len(self.cases)
+        if 0 < case_fraction <= 1:
+            self.total_case_fraction = case_fraction * len(self.cases[0])
         else: raise ValueError("case fraction needs to be between 0 and 1.")
 
         self.organize_cases()
@@ -28,8 +28,10 @@ class CaseManager():
         # TODO: Implement the remaining datasets...
         if case == "wine quality": return None
         if case == "glass": return None
+        if case == "mnist":
+            from datasets.mnist_zip.mnist_basics import gen_flat_cases
+            return gen_flat_cases
         if case == "yeast": return None
-        if case == "mnist": return None
 
         # TODO: Implement the hacker's choice dataset
         if case == "hackers choice": return None

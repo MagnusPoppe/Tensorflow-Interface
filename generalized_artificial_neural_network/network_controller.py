@@ -16,11 +16,11 @@ class NetworkController():
         self.validation_history = []
         self.validation_interval = configuration.validation_interval
 
-    def do_training(self,sess,cases,epochs=100,continued=False):
+    def do_training(self, sess, cases, epochs=100, continued=False):
         if not(continued): self.error_history = []
         for i in range(epochs):
 
-            error = 0;
+            error = 0
             step = self.net.global_training_step + i
             gvars = [self.net.error] + self.net.grabvars
             mbs = self.net.minibatch_size
@@ -30,7 +30,7 @@ class NetworkController():
             for cstart in range(0,ncases,mbs):  # Loop through cases, one minibatch at a time.
                 cend = min(ncases,cstart+mbs)
                 minibatch = cases[cstart:cend]
-                inputs = [c[0] for c in minibatch];
+                inputs = [c[0] for c in minibatch]
                 targets = [c[1] for c in minibatch]
                 feeder = {self.net.input: inputs, self.net.target: targets}
                 _,grabvals,_ = self.run_one_step([self.net.trainer],gvars,self.net.probes,session=sess,
@@ -38,15 +38,15 @@ class NetworkController():
                 error += grabvals[0]
             self.error_history.append((step, error/nmb))
             self.consider_validation_testing(step,sess)
-        self.net.global_training_step += epochs
         TFT.plot_training_history(self.error_history,self.validation_history,xtitle="Epoch",ytitle="Error",
                                   title="",fig=not(continued))
+        self.net.global_training_step += epochs
 
     def do_testing(self,sess,cases,msg='Testing'):
         inputs = [c[0] for c in cases]; targets = [c[1] for c in cases]
         feeder = {self.net.input: inputs, self.net.target: targets}
         error, grabvals, _ = self.run_one_step(self.net.error, self.net.grabvars, self.net.probes, session=sess,
-                                           feed_dict=feeder,  show_interval=None)
+                                           feed_dict=feeder,  show_interval=self.net.show_interval)
         print('%s Set Error = %f ' % (msg, error))
         return error  # self.error uses MSE, so this is a per-case value
 

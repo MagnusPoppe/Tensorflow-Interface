@@ -39,14 +39,13 @@ class Optimizer(Enum):
     tf.train.ProximalAdagradOptimizer
     tf.train.RMSPropOptimizer
     """
-    OPTIMISER = 0
-    GRADIENT_DECENT = 1
-    ADADELTA = 2
-    ADAGRAD = 3
-    ADAGRADDA = 4
-    MOMENTUM = 5
-    ADAM = 6
-    FTRL = 7
-    PROXIMAL_GRADIENT_DECENT = 8
-    PROXIMAL_ADAGRAD = 9
-    RMS_PROP = 10
+    GRADIENT_DECENT = 0
+    ADADELTA = 1
+    ADAGRAD = 2
+    ADAGRADDA = 3
+    MOMENTUM = 4
+    ADAM = 5
+    FTRL = 6
+    PROXIMAL_GRADIENT_DECENT = 7
+    PROXIMAL_ADAGRAD = 8
+    RMS_PROP = 9

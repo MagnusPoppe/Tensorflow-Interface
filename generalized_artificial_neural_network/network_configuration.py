@@ -21,7 +21,7 @@ class NetworkConfiguration:
         GradientDescentOptimizer, or use momentum for faster convergence,
     """
     def __init__(self, file=None):
-        with open("configurations/one-hot.json", "r") as f:
+        with open(file, "r") as f:
             input = json.loads(" ".join(f.readlines()))
 
         # DATASET:
@@ -56,7 +56,13 @@ class NetworkConfiguration:
         self.display_biases             = input["visualisation"]["display_biases"] # todo: is this in use?
 
         # SETTING CASEMANAGER:
-        self.manager = CaseManager(self.dataset, self.mini_batch_size, self.validation_fraction, self.test_fraction)
+        self.manager = CaseManager(
+            self.dataset,
+            self.mini_batch_size,
+            self.total_case_fraction,
+            self.validation_fraction,
+            self.test_fraction
+        )
 
     def export(self):
         """ Creates a dictionary out of all the values and then dumps to json. """

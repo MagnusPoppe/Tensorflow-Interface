@@ -77,7 +77,7 @@ class NetworkLayer():
         # Creates the weights and biases:
         self.weights = tf.Variable(
             np.random.uniform(lower, upper, size = (self.in_neurons,self.out_neurons)),
-            name            =  self.name+'-wgt',
+            name            =  self.name+'-weight',
             trainable       = True
         )
         self.biases  = tf.Variable(
