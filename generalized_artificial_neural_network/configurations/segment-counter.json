@@ -1,16 +1,16 @@
 {
    "network_configuration":{
-      "optimizer":1,
-      "hidden_activation":0,
-      "learning_rate":0.1,
+      "optimizer":0,
+      "hidden_activation":1,
+      "learning_rate":0.3,
       "validation_test_interval":100,
-      "output_activation":1,
-      "use_softmax":false,
-      "network_dimensions":[ 25, 10, 1 ],
+      "output_activation":0,
+      "use_softmax":true,
+      "network_dimensions":[ 25, 4, 9 ],
       "cost_function":0,
       "weight_range":{
-         "upper":0.1,
-         "lower":-0.1
+         "upper":1,
+         "lower":0
       }
    },
    "run_configuration":{
