@@ -39,7 +39,7 @@ class NetworkController():
             self.error_history.append((step, error/nmb))
             self.consider_validation_testing(step,sess)
         TFT.plot_training_history(self.error_history,self.validation_history,xtitle="Epoch",ytitle="Error",
-                                  title="",fig=not(continued))
+                                  title="", fig=not(continued))
         self.net.global_training_step += epochs
 
     def do_testing(self,sess,cases,msg='Testing'):

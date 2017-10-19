@@ -2,7 +2,7 @@
    "network_configuration":{
       "optimizer":0,
       "hidden_activation":0,
-      "learning_rate":0.03,
+      "learning_rate":0.20,
       "validation_test_interval":100,
       "output_activation":1,
       "use_softmax":false,
