@@ -30,6 +30,6 @@ if __name__ == '__main__':
     # ann.net.gen_probe(1, 'out', ('avg', 'max'))  # Plot average and max value of module 1's output vector
     # ann.net.add_grabvar(0, 'wgt')  # Add a grabvar (to be displayed in its own matplotlib window).
     ann.run(c.epochs)
-    print("\n\n RUNNING MORE... \n")
-    ann.runmore(c.epochs)
+    # print("\n\n RUNNING MORE... \n")
+    # ann.runmore(c.epochs)
     # return ann

@@ -6,17 +6,17 @@
       "learning_rate":0.0095,
       "validation_test_interval":100,
       "use_softmax":true,
-      "network_dimensions":[ 10, 5, 3, 2 ],
+      "network_dimensions":[ 10, 8, 13, 2 ],
       "cost_function":0,
       "weight_range":{
-         "upper":1,
-         "lower":-1
+         "upper":  0,
+         "lower": -1
       }
    },
    "run_configuration":{
       "map-batch-size":1,
       "mini-batch-size":20,
-      "epochs":1000
+      "epochs": 250
    },
    "visualisation":{
       "display_biases":false,

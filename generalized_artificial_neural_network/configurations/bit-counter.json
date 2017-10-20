@@ -1,22 +1,22 @@
 {
    "network_configuration":{
-      "optimizer":0,
+      "optimizer": 6,
       "hidden_activation":1,
-      "learning_rate":0.05,
+      "learning_rate":0.031,
       "validation_test_interval":100,
-      "output_activation":0,
+      "output_activation": 3,
       "use_softmax":false,
-      "network_dimensions":[ 15, 5, 16 ],
+      "network_dimensions":[ 15, 15, 14, 16 ],
       "cost_function": 0,
       "weight_range":{
-         "upper":0.1,
-         "lower":-0.1
+         "upper": 1,
+         "lower":-1
       }
    },
    "run_configuration":{
       "map-batch-size":1,
       "mini-batch-size":10,
-      "epochs":250
+      "epochs": 2000
    },
    "visualisation":{
       "display_biases":false,
@@ -26,9 +26,9 @@
       "map_layers":[ 1,  2,  3 ]
    },
    "dataset":{
-      "validation_fraction":0.1,
+      "validation_fraction":0.2,
       "steps_per_minibatch":0,
-      "test_fraction":0.1,
+      "test_fraction":0.2,
       "name":"bit-counter",
       "total_case_fraction":1.0
    }
