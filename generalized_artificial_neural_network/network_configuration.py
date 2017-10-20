@@ -20,6 +20,18 @@ class NetworkConfiguration:
     4.  Use better optimizers(AdamOptimizer, AdagradOptimizer) instead of
         GradientDescentOptimizer, or use momentum for faster convergence,
     """
+    known_cases = [
+        "bit-counter",
+        "segment-counter",
+        "dense",
+        "parity",
+        "one-hot-bit",
+        "minst",
+        "glass",
+        "yeast",
+        "wine quality"
+    ]
+
     def __init__(self, file=None):
         with open(file, "r") as f:
             input = json.loads(" ".join(f.readlines()))
@@ -42,6 +54,8 @@ class NetworkConfiguration:
         self.output_activation          = ActivationFunction(input["network_configuration"]['output_activation'])
         self.cost_function              = CostFunction(input["network_configuration"]['cost_function'])
         self.optimizer                  = Optimizer(input["network_configuration"]["optimizer"])
+        if "momentum" in input["network_configuration"]: self.momentum = input["network_configuration"]['momentum']
+        else:                                            self.momentum = 0
 
         # RUN CONFIGURATION
         self.mini_batch_size            = input["run_configuration"]["mini-batch-size"]
@@ -58,6 +72,7 @@ class NetworkConfiguration:
 
         classes = input["dataset"]["number_of_classes"] if self.dataset in ["yeast", "glass", "wine quality"] else 0
 
+        self.validate()
 
         # SETTING UP CASEMANAGER:
         self.manager = CaseManager(
@@ -68,6 +83,33 @@ class NetworkConfiguration:
             test_fraction=self.test_fraction,
             number_of_classes=classes
         )
+
+    def validate(self):
+        """ Checks the different parameters for errors and bad values. """
+
+        # Case manager configuration:
+        if self.dataset not in self.known_cases:
+            raise ValueError("Unknown dataset/case given.")
+        if self.total_case_fraction > 1:
+            raise ValueError("Case fraction cannot be bigger than 1.0")
+        if self.validation_fraction > 1:
+            raise ValueError("Validation fraction cannot be bigger than 1.0")
+        if self.test_fraction > 1:
+            raise ValueError("Test fraction cannot be bigger than 1.0")
+        if self.validation_fraction + self.test_fraction > 1:
+            raise ValueError("The combined value of validation-test fraction is >1. No space for training.")
+
+        if not (0 <= self.hidden_activation.value <= 6):
+            raise ValueError("Invalid activation function for hidden layer.")
+        if not (0 <= self.output_activation.value <= 6):
+            raise ValueError("Invalid activation function for hidden layer.")
+        if not (0 <= self.cost_function.value <= 2):
+            raise ValueError("Invalid cost function selected.")
+        if not (0 <= self.optimizer.value <= 10):
+            raise ValueError("Invalid optimizer selected.")
+
+        if self.momentum == 0 and self.optimizer.value in [5,8,9,10]:
+            raise ValueError("Momentum needs to be set when your optimizer is momentum-based.")
 
     def export(self):
         """ Creates a dictionary out of all the values and then dumps to json. """

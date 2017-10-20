@@ -1,8 +1,9 @@
 {
    "network_configuration":{
-      "optimizer":7,
+      "optimizer":10,
+      "momentum": 0.625,
       "hidden_activation":1,
-      "learning_rate":0.030,
+      "learning_rate":0.0275,
       "validation_test_interval":100,
       "output_activation":3,
       "use_softmax":true,
@@ -16,7 +17,7 @@
    "run_configuration":{
       "map-batch-size":1,
       "mini-batch-size":10,
-      "epochs": 5000
+      "epochs": 1000
    },
    "visualisation":{
       "display_biases":false,
@@ -26,7 +27,7 @@
       "map_layers":[ 1,  2,  3 ]
    },
    "dataset":{
-      "validation_fraction": 0.1,
+      "validation_fraction": 0.3,
       "steps_per_minibatch": 1,
       "test_fraction": 0.2,
       "name":"yeast",

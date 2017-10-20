@@ -40,6 +40,7 @@ def tfeval(operators):
 # ***** TENSORBOARD SUPPORT ****
 
 # This creates the main data for tensorboard viewing: the graph and variable histories.
+
 def viewprep(session, dir='probeview',flush=120,queue=10):
     clear_tensorflow_log(dir)  # Without this, the directory fills up with unusable files
     return tf.summary.FileWriter(dir,session.graph,flush_secs=flush,max_queue=queue)
@@ -81,6 +82,8 @@ def int_to_one_hot(int,size,off_val=0, on_val=1,floats=False):
         v = [off_val] * size
         v[int] = on_val
         return v
+
+def one_hot_to_int(vect,on_val=1): return vect.index(on_val)
 
 # Generate all one-hot vectors of length len
 def all_one_hots(len, floats=False):

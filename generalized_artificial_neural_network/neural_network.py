@@ -27,6 +27,7 @@ class NeuralNetwork():
 
         # Learning
         self.learning_rate = configuration.learning_rate
+        self.momentum = configuration.momentum
         self.optimizer_function = configuration.optimizer
 
         # Case management:
@@ -123,25 +124,20 @@ class NeuralNetwork():
             return tf.train.AdagradOptimizer(self.learning_rate)
         if self.optimizer_function == Optimizer.ADAGRADDA:
             return tf.train.AdagradDAOptimizer(self.learning_rate, self.global_training_step)
-
         if self.optimizer_function == Optimizer.MOMENTUM:
-            pass # todo: Not yet implemented.
-            # tf.train.MomentumOptimizer
-        if self.optimizer_function == Optimizer.MOMENTUM:
-            pass  # todo: Not yet implemented.
-            # tf.train.AdamOptimizer
+            return tf.train.MomentumOptimizer(self.learning_rate, self.momentum)
+        if self.optimizer_function == Optimizer.NAG:
+            return tf.train.MomentumOptimizer(self.learning_rate, self.momentum, use_nesterov=True)
+        if self.optimizer_function == Optimizer.ADAM:
+            return tf.train.AdamOptimizer(self.learning_rate)
         if self.optimizer_function == Optimizer.FTRL:
-            pass  # todo: Not yet implemented.
-            # tf.train.FtrlOptimizer
+            return tf.train.FtrlOptimizer(self.learning_rate)
         if self.optimizer_function == Optimizer.PROXIMAL_GRADIENT_DECENT:
-            pass  # todo: Not yet implemented.
-            # tf.train.ProximalGradientDescentOptimizer
+            return tf.train.ProximalGradientDescentOptimizer(self.learning_rate)
         if self.optimizer_function == Optimizer.PROXIMAL_ADAGRAD:
-            pass  # todo: Not yet implemented.
-            # tf.train.ProximalAdagradOptimizer
+            return tf.train.ProximalAdagradOptimizer(self.learning_rate)
         if self.optimizer_function == Optimizer.RMS_PROP:
-            pass  # todo: Not yet implemented.
-            # tf.train.RMSPropOptimizer
+            return tf.train.RMSPropOptimizer(self.learning_rate, momentum=self.momentum)
 
     def select_cost_function(self):
         # Cost Function used to create calculate loss/error:
@@ -152,4 +148,4 @@ class NeuralNetwork():
             return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.output, labels=self.target),name="CROSS-ENTROPY")
 
             # My implementation of cross-entropy (not as stable as tensorflow's algorithm)
-            # return - tf.reduce_mean(tf.reduce_sum(self.target * tf.log(tf.nn.softmax(self.output)), [1]) , name='CROSS-ENTROPY')
+            return - tf.reduce_mean(tf.reduce_sum(self.target * tf.log(tf.nn.softmax(self.output)), [1]) , name='CROSS-ENTROPY')

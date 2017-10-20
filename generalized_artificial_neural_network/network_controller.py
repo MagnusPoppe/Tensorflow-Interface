@@ -42,15 +42,35 @@ class NetworkController():
                                   title="", fig=not(continued))
         self.net.global_training_step += epochs
 
-    def do_testing(self,sess, cases, msg='Testing'):
+    def do_testing(self,sess,cases,msg='Testing',bestk=1):
         inputs = [c[0] for c in cases]
         targets = [c[1] for c in cases]
         feeder = {self.net.input: inputs, self.net.target: targets}
-        error, grabvals, _ = self.run_one_step(self.net.error, self.net.grabvars, self.net.probes, session=sess,
-                                           feed_dict=feeder,  show_interval=self.net.show_interval)
-        print('%s Set Error = %f ' % (msg, error))
-        return error  # self.error uses MSE, so this is a per-case value
+        self.test_func = self.net.error
+        if bestk is not None:
+            self.test_func = self.gen_match_counter(self.net.predictor, [TFT.one_hot_to_int(list(v)) for v in targets],
+                                                    k=bestk)
+        testres, grabvals, _ = self.run_one_step(self.test_func, self.net.grabvars, self.net.probes, session=sess,
+                                                 feed_dict=feeder, show_interval=None)
+        if bestk is None:
+            print('%s Set Error = %f ' % (msg, testres))
+        else:
+            print('%s Set Correct Classifications = %f %%' % (msg, 100 * (testres / len(cases))))
+        return testres  # self.error uses MSE, so this is a per-case value when bestk=None
 
+
+    # Logits = tensor, float - [batch_size, NUM_CLASSES].
+    # labels: Labels tensor, int32 - [batch_size], with values in range [0, NUM_CLASSES).
+    # in_top_k checks whether correct val is in the top k logit outputs.  It returns a vector of shape [batch_size]
+    # This returns a OPERATION object that still needs to be RUN to get a count.
+    # tf.nn.top_k differs from tf.nn.in_top_k in the way they handle ties.  The former takes the lowest index, while
+    # the latter includes them ALL in the "top_k", even if that means having more than k "winners".  This causes
+    # problems when ALL outputs are the same value, such as 0, since in_top_k would then signal a match for any
+    # target.  Unfortunately, top_k requires a different set of arguments...and is harder to use.
+
+    def gen_match_counter(self, logits, labels, k=1):
+        correct = tf.nn.in_top_k(tf.cast(logits,tf.float32), labels, k) # Return number of correct outputs
+        return tf.reduce_sum(tf.cast(correct, tf.int32))
 
     def training_session(self,epochs,sess=None,dir="probeview",continued=False):
         self.net.roundup_probes()
@@ -85,7 +105,7 @@ class NetworkController():
         else:
             results = sess.run([operators, grabbed_vars], feed_dict=feed_dict)
         if show_interval and (step % show_interval == 0):
-            pass # self.display_grabvars(results[1], grabbed_vars, step=step)
+            self.display_grabvars(results[1], grabbed_vars, step=step)
         return results[0], results[1], sess
 
     def display_grabvars(self, grabbed_vals, grabbed_vars,step=1):
@@ -101,7 +121,7 @@ class NetworkController():
             else:
                 print(v, end=('\n'))
 
-    def run(self,epochs=100,sess=None,continued=False):
+    def run(self, epochs=100, sess=None, continued=False):
         PLT.ion()
         self.training_session(epochs,sess=sess,continued=continued)
         self.test_on_trains(sess=self.current_session)
