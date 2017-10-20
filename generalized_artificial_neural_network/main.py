@@ -28,7 +28,8 @@ if __name__ == '__main__':
 
     # ann.net.gen_probe(0, 'wgt', ('hist', 'avg'))  # Plot a histogram and avg of the incoming weights to module 0.
     # ann.net.gen_probe(1, 'out', ('avg', 'max'))  # Plot average and max value of module 1's output vector
-    ann.net.add_grabvar(0, 'wgt')  # Add a grabvar (to be displayed in its own matplotlib window).
+    # ann.net.add_grabvar(0, 'wgt')  # Add a grabvar (to be displayed in its own matplotlib window).
     ann.run(c.epochs)
-    ann.runmore(c.epochs * 2)
+    print("\n\n RUNNING MORE... \n")
+    ann.runmore(c.epochs)
     # return ann

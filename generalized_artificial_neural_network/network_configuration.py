@@ -55,13 +55,18 @@ class NetworkConfiguration:
         self.display_weights            = input["visualisation"]["display_weights"] # todo: is this in use?
         self.display_biases             = input["visualisation"]["display_biases"] # todo: is this in use?
 
-        # SETTING CASEMANAGER:
+
+        classes = input["dataset"]["number_of_classes"] if self.dataset in ["yeast", "glass", "wine quality"] else 0
+
+
+        # SETTING UP CASEMANAGER:
         self.manager = CaseManager(
-            self.dataset,
-            self.mini_batch_size,
-            self.total_case_fraction,
-            self.validation_fraction,
-            self.test_fraction
+            case=self.dataset,
+            minibatch_size=self.mini_batch_size,
+            case_fraction=self.total_case_fraction,
+            validation_fraction=self.validation_fraction,
+            test_fraction=self.test_fraction,
+            number_of_classes=classes
         )
 
     def export(self):

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ee6988ea-38df-483b-969a-22eb18efed11" name="idun" url="dun.hpc.ntnu.no">
+        <fileTransfer host="idun.hpc.ntnu.no" port="22" rootFolder="/home/magnuspw" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
