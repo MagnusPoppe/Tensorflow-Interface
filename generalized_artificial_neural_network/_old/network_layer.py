@@ -33,19 +33,7 @@ class NetworkLayer():
         # Size of this layer:
         self.out_neurons=out_neurons # Number of neurons in this module
 
-        # Activation function used on the output layer:
-        if activation_func == ActivationFunction.RECTIFIED_LINEAR:
-            self.activation_function = tf.nn.relu
-        elif activation_func == ActivationFunction.SIGMOID:
-            self.activation_function = tf.sigmoid
-        elif activation_func == ActivationFunction.EXPONENTIAL_LINEAR:
-            self.activation_function = tf.nn.elu
-        elif activation_func == ActivationFunction.SOFTPLUS:
-            self.activation_function = tf.nn.softplus
-        elif activation_func == ActivationFunction.SOFTSIGN:
-            self.activation_function = tf.nn.softsign
-        elif activation_func == ActivationFunction.HYPERBOLIC_TANGENT:
-            self.activation_function = tf.tanh
+        self.activation_function = activation_func
 
         # Other information for visualization (e.g. TensorBoard):
         self.placement_in_network = placement_in_network        # index.
@@ -53,6 +41,7 @@ class NetworkLayer():
 
         # Building network:
         self.build(lower, upper)
+
 
     def build(self, lower, upper):
         """
@@ -87,10 +76,42 @@ class NetworkLayer():
         )
 
         # Creates the output layer.
-        self.out_layer = self.activation_function(
-            tf.matmul(self.in_layer, self.weights) + self.biases,
-            name=self.name + '-out'
-        )
+        if self.activation_function == ActivationFunction.SIGMOID:
+            self.out_layer = tf.sigmoid(
+                tf.matmul(self.in_layer, self.weights) + self.biases,
+                name=self.name + '-out'
+            )
+        elif self.activation_function == ActivationFunction.RECTIFIED_LINEAR:
+            self.out_layer = tf.nn.relu(
+                tf.matmul(self.in_layer, self.weights) + self.biases,
+                name=self.name + '-out'
+            )
+        elif self.activation_function == ActivationFunction.EXPONENTIAL_LINEAR:
+            self.out_layer = tf.nn.elu(
+                tf.matmul(self.in_layer, self.weights) + self.biases,
+                name=self.name + '-out'
+            )
+        elif self.activation_function == ActivationFunction.HYPERBOLIC_TANGENT:
+            self.out_layer = tf.tanh(
+                tf.matmul(self.in_layer, self.weights) + self.biases,
+                name=self.name + '-out'
+            )
+        elif self.activation_function == ActivationFunction.SOFTMAX:
+            self.out_layer = tf.nn.softmax(
+                tf.matmul(self.in_layer, self.weights) + self.biases,
+                name=self.name + '-out'
+            )
+        elif self.activation_function == ActivationFunction.SOFTPLUS:
+            self.out_layer = tf.nn.softplus(
+                tf.matmul(self.in_layer, self.weights) + self.biases,
+                name=self.name + '-out'
+            )
+        elif self.activation_function == ActivationFunction.SOFTSIGN:
+            self.out_layer = tf.nn.softsign(
+                tf.matmul(self.in_layer, self.weights) + self.biases,
+                name=self.name + '-out'
+            )
+
         self.network.add_module(self)
 
     def getvar(self, type:tuple):

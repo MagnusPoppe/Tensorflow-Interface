@@ -26,7 +26,7 @@ class NetworkConfiguration:
         "dense",
         "parity",
         "one-hot-bit",
-        "minst",
+        "mnist",
         "glass",
         "yeast",
         "wine quality"
@@ -42,14 +42,15 @@ class NetworkConfiguration:
         self.steps_per_minibatch        = input["dataset"]["steps_per_minibatch"]
         self.validation_fraction        = input["dataset"]["validation_fraction"]
         self.test_fraction              = input["dataset"]["test_fraction"]
+        self.normalize = input["dataset"]["normalize"] if "normalize" in input["dataset"] else False
 
         # NETWORK CONFIGURATION:
         self.network_dimensions         = input["network_configuration"]['network_dimensions']
         self.learning_rate              = input["network_configuration"]['learning_rate']
         self.validation_interval        = input["network_configuration"]['validation_test_interval']
-        self.softmax                    = input["network_configuration"]['use_softmax']
         self.lower_bound_weight_range   = input["network_configuration"]['weight_range']['lower']
         self.upper_bound_weight_range   = input["network_configuration"]['weight_range']['upper']
+        # self.softmax_outputs            = input["network_configuration"]["use_softmax"]
         self.hidden_activation          = ActivationFunction(input["network_configuration"]['hidden_activation'])
         self.output_activation          = ActivationFunction(input["network_configuration"]['output_activation'])
         self.cost_function              = CostFunction(input["network_configuration"]['cost_function'])
@@ -63,21 +64,21 @@ class NetworkConfiguration:
         self.epochs                     = input["run_configuration"]["epochs"]
 
         # VISUALISATION
-        self.display_interval           = input["visualisation"]["display_interval"] # todo: is this in use?
-        self.map_layers                 = input["visualisation"]["map_layers"] # todo: is this in use?
+        self.display_interval           = input["visualisation"]["display_interval"]
+        self.map_layers                 = input["visualisation"]["map_layers"]
+        self.probe_layers                 = input["visualisation"]["probe_layers"]
         self.map_dendrograms            = input["visualisation"]["map_dendrograms"] # todo: is this in use?
-        self.display_weights            = input["visualisation"]["display_weights"] # todo: is this in use?
-        self.display_biases             = input["visualisation"]["display_biases"] # todo: is this in use?
-
 
         classes = input["dataset"]["number_of_classes"] if self.dataset in ["yeast", "glass", "wine quality"] else 0
+
+        if self.validation_interval == "half": self.validation_interval = self.epochs/2
 
         self.validate()
 
         # SETTING UP CASEMANAGER:
         self.manager = CaseManager(
             case=self.dataset,
-            minibatch_size=self.mini_batch_size,
+            normalize=self.normalize,
             case_fraction=self.total_case_fraction,
             validation_fraction=self.validation_fraction,
             test_fraction=self.test_fraction,
@@ -108,8 +109,19 @@ class NetworkConfiguration:
         if not (0 <= self.optimizer.value <= 10):
             raise ValueError("Invalid optimizer selected.")
 
+        if self.cost_function == 1 and self.output_activation != 4:
+            raise ValueError("Using cross entropy can only be used when output activation function is softmax")
+
         if self.momentum == 0 and self.optimizer.value in [5,8,9,10]:
             raise ValueError("Momentum needs to be set when your optimizer is momentum-based.")
+
+        if self.epochs <= self.validation_interval:
+            raise ValueError("Having a validation interval that is equal or bigger that epochs can cause bugs.")
+
+        # if self.softmax_outputs and self.cost_function in [1, 2]:
+        #     self.softmax_outputs = False
+        # if not self.softmax_outputs and self.cost_function in [1, 2]:
+        #     ValueError("Softmax has to be used with cross entropy.")
 
     def export(self):
         """ Creates a dictionary out of all the values and then dumps to json. """
@@ -117,6 +129,7 @@ class NetworkConfiguration:
             f.write( json.dumps( self.to_dict()) )
 
     def to_dict(self):
+        # TODO: Update this to contain all values.
         return {
             "dataset": {
                 "name": self.dataset,

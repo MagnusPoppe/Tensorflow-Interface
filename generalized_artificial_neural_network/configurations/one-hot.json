@@ -2,26 +2,25 @@
    "network_configuration":{
       "optimizer":0,
       "hidden_activation":1,
-      "learning_rate":0.20,
+      "learning_rate":0.03,
       "validation_test_interval":100,
-      "output_activation":0,
+      "output_activation":1,
       "use_softmax":false,
       "network_dimensions":[
          16,
-         4,
          4,
          16
       ],
       "cost_function":0,
       "weight_range":{
-         "upper":1,
-         "lower":0
+         "upper":0.1,
+         "lower":-0.1
       }
    },
    "run_configuration":{
       "map-batch-size":1,
       "mini-batch-size":16,
-      "epochs":725
+      "epochs":300
    },
    "visualisation":{
       "display_biases":false,
@@ -29,15 +28,14 @@
       "map_dendrograms":false,
       "display_interval":100,
       "map_layers":[
-         1,
-         2,
-         3
-      ]
+         {"placement":1, "component": "out"}
+      ],
+      "probe_layers": []
    },
    "dataset":{
-      "validation_fraction":0.2,
+      "validation_fraction":0.1,
       "steps_per_minibatch":1,
-      "test_fraction":0.2,
+      "test_fraction":0.1,
       "name":"one-hot-bit",
       "total_case_fraction":1.0
    }

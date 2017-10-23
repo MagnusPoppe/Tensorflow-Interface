@@ -1,20 +1,24 @@
-import downing_code.tflowtools as TFT
-from generalized_artificial_neural_network.case_manager import CaseManager
-from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
-from generalized_artificial_neural_network.neural_network import NeuralNetwork
-
-import tensorflow as tf
-import numpy as np
 import math
-import matplotlib.pyplot as PLT
+
+import numpy as np
+import tensorflow as tf
+
+import downing_code.tflowtools as TFT
+from generalized_artificial_neural_network._old.neural_network import NeuralNetwork
+from generalized_artificial_neural_network.live_graph import LiveGraph
+from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
+
 
 class NetworkController():
 
     def __init__(self, configuration: NetworkConfiguration):
         self.casemanager = configuration.manager
+        self.graph = None
         self.net = NeuralNetwork(configuration)
         self.validation_history = []
         self.validation_interval = configuration.validation_interval
+        self.show_interval = configuration.display_interval
+
 
     def do_training(self, sess, cases, epochs=100, continued=False):
         if not(continued): self.error_history = []
@@ -33,13 +37,23 @@ class NetworkController():
                 inputs = [c[0] for c in minibatch]
                 targets = [c[1] for c in minibatch]
                 feeder = {self.net.input: inputs, self.net.target: targets}
-                _,grabvals,_ = self.run_one_step([self.net.trainer],gvars,self.net.probes,session=sess,
-                                         feed_dict=feeder,step=step,show_interval=self.net.show_interval)
+                _, grabvals, __ = self.run_one_step(
+                    [self.net.trainer],
+                    gvars,
+                    self.net.probes,
+                    session=sess,
+                    feed_dict=feeder,
+                    step=step,
+                    show_interval=self.net.show_interval)
                 error += grabvals[0]
+
             self.error_history.append((step, error/nmb))
             self.consider_validation_testing(step,sess)
-        TFT.plot_training_history(self.error_history,self.validation_history,xtitle="Epoch",ytitle="Error",
-                                  title="", fig=not(continued))
+            if self.show_interval and (step % self.show_interval == 0):
+                self.graph.update(self.error_history, self.validation_history)
+
+        # TFT.plot_training_history(self.error_history,self.validation_history,xtitle="Epoch",ytitle="Error",
+        #                           title="", fig=not(continued))
         self.net.global_training_step += epochs
 
     def do_testing(self,sess,cases,msg='Testing',bestk=1):
@@ -48,14 +62,23 @@ class NetworkController():
         feeder = {self.net.input: inputs, self.net.target: targets}
         self.test_func = self.net.error
         if bestk is not None:
-            self.test_func = self.gen_match_counter(self.net.predictor, [TFT.one_hot_to_int(list(v)) for v in targets],
-                                                    k=bestk)
-        testres, grabvals, _ = self.run_one_step(self.test_func, self.net.grabvars, self.net.probes, session=sess,
-                                                 feed_dict=feeder, show_interval=None)
+            self.test_func = self.gen_match_counter(
+                self.net.predictor,
+                [TFT.one_hot_to_int(list(v)) for v in targets],
+                k=bestk)
+
+        testres, grabvals, _ = self.run_one_step(
+            self.test_func,
+            self.net.grabvars,
+            self.net.probes,
+            session=sess,
+            feed_dict=feeder,
+            show_interval=self.show_interval)
+
         if bestk is None:
             print('%s Set Error = %f ' % (msg, testres))
         else:
-            print('%s Set Correct Classifications = %f %%' % (msg, 100 * (testres / len(cases))))
+            print('%s Set Correct Classifications = %f %%' % (msg, 100 * testres / len(cases)))
         return testres  # self.error uses MSE, so this is a per-case value when bestk=None
 
 
@@ -76,6 +99,8 @@ class NetworkController():
         self.net.roundup_probes()
         session = sess if sess else TFT.gen_initialized_session(dir=dir)
         self.current_session = session
+
+        self.graph = LiveGraph(x_title="Epoch",y_title="Error", graph_title="Error vs validation", epochs=epochs)
         self.do_training(session,self.casemanager.get_training_cases(),epochs,continued=continued)
 
     def testing_session(self,sess):
@@ -99,6 +124,7 @@ class NetworkController():
     def run_one_step(self, operators, grabbed_vars=None, probed_vars=None, dir='probeview',
                   session=None, feed_dict=None, step=1, show_interval=1):
         sess = session if session else TFT.gen_initialized_session(dir=dir)
+
         if probed_vars is not None:
             results = sess.run([operators, grabbed_vars, probed_vars], feed_dict=feed_dict)
             sess.probe_stream.add_summary(results[2], global_step=step)
@@ -106,6 +132,7 @@ class NetworkController():
             results = sess.run([operators, grabbed_vars], feed_dict=feed_dict)
         if show_interval and (step % show_interval == 0):
             self.display_grabvars(results[1], grabbed_vars, step=step)
+
         return results[0], results[1], sess
 
     def display_grabvars(self, grabbed_vals, grabbed_vars,step=1):
@@ -122,12 +149,12 @@ class NetworkController():
                 print(v, end=('\n'))
 
     def run(self, epochs=100, sess=None, continued=False):
-        PLT.ion()
+        # PLT.ion()
         self.training_session(epochs,sess=sess,continued=continued)
         self.test_on_trains(sess=self.current_session)
         self.testing_session(sess=self.current_session)
         self.close_current_session()
-        PLT.ioff()
+        # PLT.ioff()
 
     # After a run is complete, runmore allows us to do additional training on the network, picking up where we
     # left off after the last call to run (or runmore).  Use of the "continued" parameter (along with

@@ -3,10 +3,11 @@
       "optimizer":0,
       "hidden_activation":1,
       "learning_rate":0.3,
-      "validation_test_interval":100,
-      "output_activation":0,
       "use_softmax":true,
-      "network_dimensions":[ 25, 4, 9 ],
+
+      "validation_test_interval":10,
+      "output_activation":3,
+      "network_dimensions":[ 25, 10, 10, 9 ],
       "cost_function":0,
       "weight_range":{
          "upper":1,
@@ -16,14 +17,17 @@
    "run_configuration":{
       "map-batch-size":1,
       "mini-batch-size":20,
-      "epochs":100
+      "epochs":200
    },
    "visualisation":{
       "display_biases":false,
       "display_weights":false,
       "map_dendrograms":false,
-      "display_interval":100,
-      "map_layers":[ 1,  2,  3 ]
+      "display_interval":10,
+      "map_layers":[
+         {"placement":2, "component": "out"}
+      ],
+      "probe_layers": []
    },
    "dataset":{
       "validation_fraction":0.1,

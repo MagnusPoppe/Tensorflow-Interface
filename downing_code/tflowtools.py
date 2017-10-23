@@ -340,7 +340,7 @@ def hinton_plot(matrix, maxval=None, maxsize=1, fig=None,trans=True,scale=True, 
 
     axes = hfig.gca()
     axes.clear()
-    axes.patch.set_facecolor(colors[0]);  # This is the background color.  Hinton uses gray
+    axes.patch.set_facecolor(colors[0])  # This is the background color.  Hinton uses gray
     axes.set_aspect('auto','box')  # Options: ('equal'), ('equal','box'), ('auto'), ('auto','box')..see matplotlib docs
     axes.xaxis.set_major_locator(PLT.NullLocator()); axes.yaxis.set_major_locator(PLT.NullLocator())
 

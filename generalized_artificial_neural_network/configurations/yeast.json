@@ -1,36 +1,41 @@
 {
    "network_configuration":{
-      "optimizer":10,
-      "momentum": 0.625,
+      "optimizer":9,
+      "momentum": 0.5,
       "hidden_activation":1,
-      "learning_rate":0.0275,
-      "validation_test_interval":100,
-      "output_activation":3,
-      "use_softmax":true,
-      "network_dimensions":[ 8, 5, 10 ],
+      "learning_rate":0.001,
+      "validation_test_interval": 25,
+      "output_activation": 4,
+      "use_softmax":false,
+      "network_dimensions":[ 8, 100, 75, 50, 10 ],
       "cost_function":0,
       "weight_range":{
-         "upper": 0.5,
-         "lower":-0.5
+         "upper":  1,
+         "lower": -1
       }
    },
    "run_configuration":{
       "map-batch-size":1,
-      "mini-batch-size":10,
+      "mini-batch-size":20,
       "epochs": 1000
    },
    "visualisation":{
       "display_biases":false,
       "display_weights":false,
       "map_dendrograms":false,
-      "display_interval":100,
-      "map_layers":[ 1,  2,  3 ]
+      "display_interval":25,
+      "map_layers":[
+         {"placement":1, "component": "weight"},
+         {"placement":2, "component": "bias"},
+         {"placement":3, "component": "out"}
+      ]
    },
    "dataset":{
-      "validation_fraction": 0.3,
+      "validation_fraction": 0.1,
       "steps_per_minibatch": 1,
-      "test_fraction": 0.2,
+      "test_fraction": 0.20,
       "name":"yeast",
+      "normalize": false,
       "number_of_classes": 10,
       "total_case_fraction": 1.0
    }

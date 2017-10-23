@@ -2,10 +2,31 @@
 <project version="4">
   <component name="PublishConfigData" serverName="idun">
     <serverData>
+      <paths name="Copy of project-level server 'idun'">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/module3" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="Copy of project-level server 'ntnu.stud'">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/others/shomea/m/magnuspw/dev" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="idun">
         <serverdata>
           <mappings>
             <mapping deploy="/module3" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="ntnu.stud">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/others/shomea/m/magnuspw/dev" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

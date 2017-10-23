@@ -17,13 +17,15 @@ class ActivationFunction(Enum):
     RECTIFIED_LINEAR = 1
     EXPONENTIAL_LINEAR = 2
     HYPERBOLIC_TANGENT = 3
-    SOFTPLUS = 4
-    SOFTSIGN = 5
-    DROPOUT = 6
+    SOFTMAX = 4
+    SOFTPLUS = 5
+    SOFTSIGN = 6
+    DROPOUT = 7
 
 class CostFunction(Enum):
     MEAN_SQUARED_ERROR = 0
-    CROSS_ENTROPY = 1
+    CROSS_ENTROPY_TENSORFLOW_DEFAULT = 1
+    CROSS_ENTROPY_FORMULA = 2
 
 class Optimizer(Enum):
     """

@@ -1,9 +1,9 @@
-import tensorflow as tf
 import matplotlib.pyplot as PLT
+import tensorflow as tf
 
+from generalized_artificial_neural_network._old.network_layer import NetworkLayer
 from generalized_artificial_neural_network.enums import CostFunction, Optimizer
 from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
-from generalized_artificial_neural_network.network_layer import NetworkLayer
 
 
 class NeuralNetwork():
@@ -21,9 +21,9 @@ class NeuralNetwork():
         self.cost_function = configuration.cost_function
 
         # Activation functions:
-        self.softmax_outputs = configuration.softmax
         self.hidden_layer_activation_function = configuration.hidden_activation
         self.output_layer_activation_function = configuration.output_activation
+        # self.softmax_outputs = configuration.softmax_outputs
 
         # Learning
         self.learning_rate = configuration.learning_rate
@@ -42,7 +42,7 @@ class NeuralNetwork():
 
         # Other information:
         # Enables coherent data-storage during extra training runs (see runmore).
-        self.global_training_step = configuration.steps_per_minibatch
+        self.global_training_step = 0
 
         # Building the network:
         self.build()
@@ -75,7 +75,7 @@ class NeuralNetwork():
         # Build all of the modules
         for placement, out_layer_size in enumerate(self.layer_dimensions[1:]):
             # Choosing the correct activation function:
-            if placement < len(self.layer_dimensions) - 1:
+            if placement +1 != len(self.layer_dimensions) -1:
                 activation = self.hidden_layer_activation_function
             else:
                 activation = self.output_layer_activation_function
@@ -98,11 +98,11 @@ class NeuralNetwork():
         # After the network has been built, we store the last layer as output layer:
         self.output = layer.out_layer
 
-        if self.softmax_outputs and self.cost_function != CostFunction.CROSS_ENTROPY:
-            self.output = tf.nn.softmax(self.output)
+        # Adding softmax to outputs:
+        # if self.softmax_outputs: self.output = tf.nn.softmax(self.output)
 
         # Adding a target value for the net. This is a placeholder. The value comes from the datasets.
-        self.target = tf.placeholder(tf.float64,shape=(None,layer.out_neurons),name='Target')
+        self.target = tf.placeholder(tf.float64, shape=(None,layer.out_neurons),name='Target')
         self.configure_learning()
 
     def configure_learning(self):
@@ -142,10 +142,22 @@ class NeuralNetwork():
     def select_cost_function(self):
         # Cost Function used to create calculate loss/error:
         if self.cost_function == CostFunction.MEAN_SQUARED_ERROR:
-            return tf.reduce_mean(tf.square(self.target - self.output),name='MSE')
-        if self.cost_function == CostFunction.CROSS_ENTROPY:
-            # Tensorflow implementation of cross-entropy
-            return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.output, labels=self.target),name="CROSS-ENTROPY")
+            return tf.reduce_mean(
+                tf.square(self.target - self.output),
+                name='MEAN-SQUARED-ERROR'
+            )
 
+        if self.cost_function == CostFunction.CROSS_ENTROPY_TENSORFLOW_DEFAULT:
+            # Tensorflow implementation of cross-entropy
+            return tf.reduce_mean(
+                tf.nn.softmax_cross_entropy_with_logits(logits=self.output, labels=self.target),
+                name="CROSS-ENTROPY-ERROR"
+            )
+
+        if self.cost_function == CostFunction.CROSS_ENTROPY_FORMULA:
             # My implementation of cross-entropy (not as stable as tensorflow's algorithm)
-            return - tf.reduce_mean(tf.reduce_sum(self.target * tf.log(tf.nn.softmax(self.output)), [1]) , name='CROSS-ENTROPY')
+            self.output = tf.nn.softmax(self.output)
+            return - tf.reduce_mean(
+                tf.reduce_sum(self.target * tf.log(self.output), [1]) ,
+                name='CROSS-ENTROPY-ERROR'
+            )
