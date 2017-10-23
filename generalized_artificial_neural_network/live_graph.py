@@ -14,7 +14,7 @@ class LiveGraph():
         self.validation_graph = None
         self.figure.show()
 
-    def update(self, error_history, validation_history):
+    def update(self, error_history=[], validation_history=[]):
         # PLT.ion()
         if error_history:
             self.error_graph = self.plot(error_history, self.error_graph)

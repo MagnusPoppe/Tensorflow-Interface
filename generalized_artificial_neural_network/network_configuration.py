@@ -45,6 +45,7 @@ class NetworkConfiguration:
         self.normalize = input["dataset"]["normalize"] if "normalize" in input["dataset"] else False
 
         # NETWORK CONFIGURATION:
+        self.input_vector_size          = input["network_configuration"]['input_vector_size']
         self.network_dimensions         = input["network_configuration"]['network_dimensions']
         self.learning_rate              = input["network_configuration"]['learning_rate']
         self.validation_interval        = input["network_configuration"]['validation_test_interval']
