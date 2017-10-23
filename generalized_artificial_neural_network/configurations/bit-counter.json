@@ -17,7 +17,7 @@
    "run_configuration":{
       "map-batch-size":1,
       "mini-batch-size":10,
-      "epochs": 2000
+      "epochs": 200
    },
    "visualisation":{
       "display_biases":false,

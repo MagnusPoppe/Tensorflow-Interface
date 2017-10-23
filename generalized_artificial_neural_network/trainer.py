@@ -7,6 +7,9 @@ from generalized_artificial_neural_network.network import NeuralNetwork
 from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
 
 
+
+
+
 class Trainer():
 
     def __init__(self, file:str, session:tf.Session=None, display_graph:bool=True):
@@ -63,28 +66,52 @@ class Trainer():
             # Updating error history for the graph:
             self.error_history.append((epoch, error))
 
-            # Printing status update:
+            # Perform validation test if interval:
+            if epoch % self.config.validation_interval == 0:
+                self.validation_history += [(epoch, self.test(cases=self.config.manager.get_validation_cases()))]
 
-            # TODO: Validation interval?
+
+            # Printing status update:
             if epoch % self.config.display_interval == 0:
                 if self.graph:
-                    self.graph.update(self.error_history)
-                print("Epoch="+str(epoch)+"    Error="+str(error))
+                    self.graph.update(self.error_history, self.validation_history)
+                self.progress_print(epoch, error)
 
-    def test(self, cases:list):
+    def test(self, cases:list, in_top_k=False):
+        input_vectors = []
+        target_vectors = []
         for case in cases:
             # Setting the input and the desired target for this case.:
-            input_vector = case[0]
-            target_vector = case[1]
-            feeder_dictionary = {self.ann.input: [input_vector], self.ann.target: [target_vector]}
+            input_vectors += [case[0]]
+            target_vectors += [case[1]]
 
-            # Setting the parameters for the session.run.
-            parameters = [self.ann.predictor, self.ann.error]
+        feeder_dictionary = {self.ann.input: input_vectors, self.ann.target: target_vectors}
 
-            # Actually running:
-            results = self.session.run( parameters, feed_dict=feeder_dictionary )
+        # Selecting error function:
+        if not in_top_k:
+            test_module = self.ann.predictor
+        else:
+            labels = [ v.index(1) for v in target_vectors ]
+            test_module = self._create_in_top_k_operator(self.ann.predictor, labels)
 
-            print("ERROR: " + str(results[1]))
+        # Setting the parameters for the session.run.
+        parameters = [test_module, self.ann.error]
+
+        # Actually running:
+        results = self.session.run( parameters, feed_dict=feeder_dictionary )
+
+        # print("TEST ERROR: " + str(results[1]))
+        return results[1]
+
+    def progress_print(self, epoch, error):
+
+        print("Epoch=" + "0"*(len(str(self.config.epochs)) - len(str(epoch))) + str(epoch) + "    "
+              "Error=" + str(error) + "    "
+              "Validation=" + (str(self.validation_history[-1][1]) if self.validation_history else "0"))
+
+    def _create_in_top_k_operator(self, logits, labels, k=1):
+        correct = tf.nn.in_top_k(tf.cast(logits,tf.float32), labels, k) # Return number of correct outputs
+        return tf.reduce_sum(tf.cast(correct, tf.int32))
 
     def _create_session(self, directory='probeview') -> tf.Session:
         # Clearing the output folders for previous output:
@@ -106,9 +133,9 @@ if __name__ == '__main__':
     file = "bit-counter.json" #"glass.json" #"one-hot.json"
     configuration_file = os.path.join("configurations", file)
 
-    coach = Trainer(configuration_file, display_graph=True)
+    coach = Trainer(configuration_file, display_graph=False)
     coach.train(epochs=coach.config.epochs)
-    coach.test(coach.config.manager.get_testing_cases())
+    coach.test(coach.config.manager.get_testing_cases(), in_top_k=False)
 
     print("RUN COMPLETE!")
     print("Error after training: " + str(coach.error_history[-1][1]))
