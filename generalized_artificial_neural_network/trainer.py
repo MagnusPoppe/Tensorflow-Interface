@@ -70,49 +70,44 @@ class Trainer():
             if epoch % self.config.validation_interval == 0:
                 self.validation_history += [(epoch, self.test(cases=self.config.manager.get_validation_cases()))]
 
-
             # Printing status update:
             if epoch % self.config.display_interval == 0:
                 if self.graph:
                     self.graph.update(self.error_history, self.validation_history)
-                self.progress_print(epoch, error)
+                self._progress_print(epoch, error)
 
     def test(self, cases:list, in_top_k=False):
+        # Loading up all data into the feeder dictionary. That way only one call to
+        # session.run() is needed for entire test. This is faster.
         input_vectors = []
         target_vectors = []
         for case in cases:
-            # Setting the input and the desired target for this case.:
             input_vectors += [case[0]]
             target_vectors += [case[1]]
-
         feeder_dictionary = {self.ann.input: input_vectors, self.ann.target: target_vectors}
 
         # Selecting error function:
-        if not in_top_k:
-            test_module = self.ann.predictor
-        else:
+        if in_top_k:
             labels = [ v.index(1) for v in target_vectors ]
             test_module = self._create_in_top_k_operator(self.ann.predictor, labels)
+        else: test_module = self.ann.predictor
 
         # Setting the parameters for the session.run.
         parameters = [test_module, self.ann.error]
 
         # Actually running:
         results = self.session.run( parameters, feed_dict=feeder_dictionary )
+        if in_top_k: return results[1] / len(cases)  # results[1] is error. Scaling to fit.
+        else:        return results[1]               # results[1] is error
 
-        # print("TEST ERROR: " + str(results[1]))
-        return results[1]
-
-    def progress_print(self, epoch, error):
+    def _progress_print(self, epoch, error):
 
         print("Epoch=" + "0"*(len(str(self.config.epochs)) - len(str(epoch))) + str(epoch) + "    "
               "Error=" + str(error) + "    "
               "Validation=" + (str(self.validation_history[-1][1]) if self.validation_history else "0"))
-
     def _create_in_top_k_operator(self, logits, labels, k=1):
         correct = tf.nn.in_top_k(tf.cast(logits,tf.float32), labels, k) # Return number of correct outputs
         return tf.reduce_sum(tf.cast(correct, tf.int32))
-
     def _create_session(self, directory='probeview') -> tf.Session:
         # Clearing the output folders for previous output:
         os.system('rm ' + directory + '/events.out.*')
