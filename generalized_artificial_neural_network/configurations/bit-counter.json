@@ -1,16 +1,17 @@
 {
    "network_configuration":{
-      "optimizer": 6,
+      "input_vector_size": 15,
+      "optimizer": 0,
       "hidden_activation":1,
-      "learning_rate":0.031,
+      "learning_rate":0.05,
       "validation_test_interval":100,
       "output_activation": 3,
       "use_softmax":false,
-      "network_dimensions":[ 15, 15, 14, 16 ],
+      "network_dimensions":[ 10, 10, 16 ],
       "cost_function": 0,
       "weight_range":{
-         "upper": 1,
-         "lower":-1
+         "upper": 0.1,
+         "lower":-0.1
       }
    },
    "run_configuration":{
@@ -23,7 +24,8 @@
       "display_weights":false,
       "map_dendrograms":false,
       "display_interval":100,
-      "map_layers":[ 1,  2,  3 ]
+      "map_layers":[],
+      "probe_layers":[]
    },
    "dataset":{
       "validation_fraction":0.2,

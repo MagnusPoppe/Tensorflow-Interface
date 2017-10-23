@@ -3,7 +3,7 @@
       "input_vector_size": 16,
       "optimizer":0,
       "hidden_activation":1,
-      "learning_rate":0.05,
+      "learning_rate":0.075,
       "validation_test_interval":100,
       "output_activation":1,
       "use_softmax":false,
@@ -18,13 +18,11 @@
       }
    },
    "run_configuration":{
-      "map-batch-size":1,
+      "map-batch-size":10,
       "mini-batch-size":16,
       "epochs":10000
    },
    "visualisation":{
-      "display_biases":false,
-      "display_weights":false,
       "map_dendrograms":false,
       "display_interval":100,
       "map_layers":[

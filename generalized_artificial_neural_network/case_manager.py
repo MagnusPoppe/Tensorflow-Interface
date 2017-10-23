@@ -104,7 +104,7 @@ class CaseManager():
 
             # Normalize:
             for i in range(len(cases)):
-                 for j in range(len(cases[i])):
+                 for j in range(len(cases[i][0])):
                     cases[i][0][j] = cases[i][0][j] / max
             return cases
         return read_file

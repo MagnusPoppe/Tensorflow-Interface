@@ -62,6 +62,9 @@ class NeuralNetwork:
         # The target we want to compare to needs to be the same dimensions as the output:
         self.target = tf.placeholder(tf.float64, shape=(None, self.hidden_layers[-1].out_neurons), name="Target")
 
+        # Predictor is used as the operator when testing.
+        self.predictor = self.output
+
         # The error function here is the "mean squared error".
         self.error = tf.reduce_mean(tf.square(self.target - self.output), name="Mean-squared-error")
 

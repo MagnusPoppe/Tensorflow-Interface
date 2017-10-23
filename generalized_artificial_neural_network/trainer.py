@@ -1,4 +1,6 @@
 import os
+from time import sleep
+
 import tensorflow as tf
 
 from generalized_artificial_neural_network.network import NeuralNetwork
@@ -9,10 +11,12 @@ class Trainer():
 
     def __init__(self, file:str, session:tf.Session=None, display_graph:bool=True):
 
-        self.config = NetworkConfiguration(file)
-        self.ann = NeuralNetwork(self.config)
-
         if not session:
+
+            self.config = NetworkConfiguration(file)
+            self.ann = NeuralNetwork(self.config)
+
+            # Needs to be set after the network is configured.
             self.session = self._create_session()
 
         # Data to create graphs from:
@@ -60,25 +64,38 @@ class Trainer():
             self.error_history.append((epoch, error))
 
             # Printing status update:
-            # print("Epoch="+str(epoch)+"    Error="+str(error))
 
             # TODO: Validation interval?
-            if self.graph and epoch % self.config.display_interval == 0:
-                self.graph.update(self.error_history)
+            if epoch % self.config.display_interval == 0:
+                if self.graph:
+                    self.graph.update(self.error_history)
+                print("Epoch="+str(epoch)+"    Error="+str(error))
 
-    def test(self):
-        pass
+    def test(self, cases:list):
+        for case in cases:
+            # Setting the input and the desired target for this case.:
+            input_vector = case[0]
+            target_vector = case[1]
+            feeder_dictionary = {self.ann.input: [input_vector], self.ann.target: [target_vector]}
 
-    def _create_session(self, dir='probeview', flush=120, queue=10) -> tf.Session:
+            # Setting the parameters for the session.run.
+            parameters = [self.ann.predictor, self.ann.error]
+
+            # Actually running:
+            results = self.session.run( parameters, feed_dict=feeder_dictionary )
+
+            print("ERROR: " + str(results[1]))
+
+    def _create_session(self, directory='probeview') -> tf.Session:
         # Clearing the output folders for previous output:
-        os.system('rm ' + dir + '/events.out.*')
+        os.system('rm ' + directory + '/events.out.*')
 
         # Creating session:
         session = tf.Session()
 
         # Create a probe stream and attach to the session (for use with tensorboard)
-        session.probe_stream = tf.summary.FileWriter(dir, session.graph, flush_secs=flush, max_queue=queue)
-        session.viewdir = dir  # add a second slot, viewdir, to the session
+        session.probe_stream = tf.summary.FileWriter(directory, session.graph, flush_secs=120, max_queue=10)
+        session.viewdir = directory  # add a second slot, viewdir, to the session
 
         # Initializing variables:
         session.run(tf.global_variables_initializer())
@@ -86,8 +103,28 @@ class Trainer():
 
 
 if __name__ == '__main__':
-    file = "one-hot.json"
+    file = "bit-counter.json" #"glass.json" #"one-hot.json"
     configuration_file = os.path.join("configurations", file)
 
     coach = Trainer(configuration_file, display_graph=True)
     coach.train(epochs=coach.config.epochs)
+    coach.test(coach.config.manager.get_testing_cases())
+
+    print("RUN COMPLETE!")
+    print("Error after training: " + str(coach.error_history[-1][1]))
+
+    exit(0)
+
+    run = True
+    waited = 0
+    while run:
+        x = input(">>> ")
+
+        if x in ["q", "quit"]:
+            run = False
+
+        elif x == "run more":
+            pass
+
+        elif x in "run tests":
+            coach.test(coach.config.manager.get_testing_cases())

@@ -1,21 +1,21 @@
 {
    "network_configuration":{
-      "optimizer":9,
+      "input_vector_size":9,
+      "optimizer":0,
       "hidden_activation":1,
-      "momentum": 0.1,
-      "learning_rate":0.01,
-      "validation_test_interval":25,
+      "learning_rate":0.1,
+      "validation_test_interval":2,
       "output_activation":4,
-      "network_dimensions":[ 9, 15, 6 ],
+      "network_dimensions":[ 50, 90, 19, 6 ],
       "cost_function":0,
       "use_softmax":false,
       "weight_range":{
-         "upper":1,
-         "lower":0
+         "upper":0.0,
+         "lower":-1
       }
    },
    "run_configuration":{
-      "map-batch-size":1,
+      "map-batch-size":100,
       "mini-batch-size":10,
       "epochs": 1000
    },
@@ -28,9 +28,9 @@
       "probe_layers": []
    },
    "dataset":{
-      "validation_fraction": 0.2,
+      "validation_fraction": 0.1,
       "steps_per_minibatch": 1,
-      "test_fraction": 0.2,
+      "test_fraction": 0.1,
       "name":"glass",
       "normalize": true,
       "number_of_classes": 6,
