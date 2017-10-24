@@ -1,5 +1,5 @@
 import os
-from time import sleep
+from time import sleep, time
 
 import tensorflow as tf
 
@@ -33,7 +33,7 @@ class Trainer():
 
     def run(self, epochs=None, display_graph:bool=True, hinton_plot:bool=False):
         self.graph = None
-
+        start_time = time()
         epochs = self.config.epochs if not epochs else epochs
 
         if display_graph:
@@ -50,6 +50,7 @@ class Trainer():
         # Closing session:
         self._save_session_params(session=self.session)
         self._close_session(self.session)
+        print("\nTime used for this run: " + str(time() - start_time) + " sec")
 
     def run_more(self, epochs, display_graph:bool=True, hinton_plot:bool=False):
         self._reopen_current_session()

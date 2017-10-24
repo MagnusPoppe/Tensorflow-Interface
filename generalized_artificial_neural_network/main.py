@@ -2,6 +2,8 @@ import os
 
 import time
 
+import sys
+
 from generalized_artificial_neural_network.trainer import Trainer
 
 
@@ -21,22 +23,6 @@ def mark_the_selected_modules_for_probing(configuration, coach):
             layer["component"],
             (layer["points_of_interest"][0], layer["points_of_interest"][1]))
 
-
-
-start_time = time.time()
-file = "winequality.json" # "bit-counter.json"  # "glass.json" #"one-hot.json"
-configuration_file = os.path.join("configurations", file)
-
-coach = Trainer(configuration_file)
-mark_the_selected_modules_for_probing(configuration=coach.config, coach=coach)
-mark_the_selected_modules_for_monitoring(configuration=coach.config, coach=coach)
-
-coach.run(epochs=coach.config.epochs, display_graph=True, hinton_plot=False)
-
-print("\nTime used for this run: " + str(time.time()-start_time))
-run = True
-waited = 0
-
 def input_number(text:str) -> int:
     epochs = input("\t"+text)
     while not epochs.isdigit():
@@ -44,6 +30,25 @@ def input_number(text:str) -> int:
         epochs = input("\t"+text)
     return int(epochs)
 
+def create_artificial_neural_network_from_config_file() -> Trainer:
+    configuration_file = os.path.join("configurations", file)
+    coach = Trainer(configuration_file)
+    mark_the_selected_modules_for_probing(configuration=coach.config, coach=coach)
+    mark_the_selected_modules_for_monitoring(configuration=coach.config, coach=coach)
+    return coach
+
+## Setup:
+displaymode = True
+file = "winequality.json" # "bit-counter.json"  # "glass.json" #"one-hot.json"
+
+for arg in sys.argv:
+    if arg in ["-r", "remote"]: displaymode=False
+    if ".json" in arg:          file=arg
+
+coach = create_artificial_neural_network_from_config_file()
+coach.run(epochs=coach.config.epochs, display_graph=displaymode, hinton_plot=False)
+
+run = True
 while run:
     x = input(">>> ")
 
