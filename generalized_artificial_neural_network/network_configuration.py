@@ -39,7 +39,6 @@ class NetworkConfiguration:
         # DATASET:
         self.dataset                    = input["dataset"]["name"]
         self.total_case_fraction        = input["dataset"]["total_case_fraction"]
-        self.steps_per_minibatch        = input["dataset"]["steps_per_minibatch"]
         self.validation_fraction        = input["dataset"]["validation_fraction"]
         self.test_fraction              = input["dataset"]["test_fraction"]
         self.normalize = input["dataset"]["normalize"] if "normalize" in input["dataset"] else False
@@ -58,14 +57,13 @@ class NetworkConfiguration:
 
         # RUN CONFIGURATION
         self.mini_batch_size            = input["run_configuration"]["mini-batch-size"]
-        self.map_batch_size             = input["run_configuration"]["map-batch-size"] # todo: use this
         self.epochs                     = input["run_configuration"]["epochs"]
+        self.in_top_k_test              = input["run_configuration"]["in_top_k"]
 
         # VISUALISATION
         self.display_interval           = input["visualisation"]["display_interval"]
         self.map_layers                 = input["visualisation"]["map_layers"]
-        self.probe_layers                 = input["visualisation"]["probe_layers"]
-        self.map_dendrograms            = input["visualisation"]["map_dendrograms"] # todo: is this in use?
+        self.probe_layers               = input["visualisation"]["probe_layers"]
 
         classes = input["dataset"]["number_of_classes"] if self.dataset in ["yeast", "glass", "wine quality"] else 0
 

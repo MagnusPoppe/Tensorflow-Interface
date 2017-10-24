@@ -64,7 +64,7 @@ class NeuralNetwork:
         # Predictor is used as the operator when testing.
         self.predictor = self.output
 
-        # The error function here is the "mean squared error".
+        # The error function here is the "mean squared error". TODO: Cross entropy
         self.error = tf.reduce_mean(tf.square(self.target - self.output), name="Mean-squared-error")
 
         # This is the function used to optimize the weights of the layers in the network.

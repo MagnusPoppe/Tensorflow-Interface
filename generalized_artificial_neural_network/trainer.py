@@ -2,6 +2,7 @@ import os
 from time import sleep, time
 
 import tensorflow as tf
+from numpy.core.multiarray import ndarray
 
 from generalized_artificial_neural_network.network import NeuralNetwork
 from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
@@ -28,11 +29,14 @@ class Trainer():
         self.monitored_modules = []
 
         # Graphics
+        self.graph = None
         self.hinton_figures = []     # list of matplotlib.pyplot.Figure
         self.dendrogram_figures = [] # list of matplotlib.pyplot.Figure
 
     def run(self, epochs=None, display_graph:bool=True, hinton_plot:bool=False):
-        self.graph = None
+        if self.graph:
+            self.graph.figure.clear()
+            self.graph = None
         start_time = time()
         epochs = self.config.epochs if not epochs else epochs
 
@@ -45,7 +49,7 @@ class Trainer():
         # Training
         self.train(epochs)
 
-        self.run_all_tests(in_top_k=True)
+        self.run_all_tests(in_top_k=self.config.in_top_k_test)
 
         # Closing session:
         self._save_session_params(session=self.session)
@@ -70,12 +74,22 @@ class Trainer():
         cases = self.config.manager.get_training_cases()
 
         # Setting the parameters for the session.run.
-        self.probed_modules = tf.summary.merge_all()
 
-        parameters = [self.ann.trainer, self.ann.error, self.probed_modules]
-        trainer = 0; err = 1;  probes = 2; monitored = 3
+        parameters = [self.ann.trainer, self.ann.error]
+        trainer = 0; err = 1;  probes = -1; monitored = -1
 
-        if self.monitored_modules is not None:parameters += [self.monitored_modules]
+        if self.config.probe_layers:
+            self.probed_modules = tf.summary.merge_all()
+            parameters += [self.probed_modules]
+            probes = 2
+
+        if self.monitored_modules is not None:
+            parameters += [self.monitored_modules]
+            monitored = 3 if probes == 2 else 2
+
+        # Scaling minibatch sizes:
+        if len(cases) < self.config.mini_batch_size:
+            self.config.mini_batch_size = len(cases)-1
 
         # Looping through epochs. One epoch is a run through all cases.
         for epoch in range(epochs):
@@ -105,6 +119,7 @@ class Trainer():
             # Printing status update:
             if epoch % self.config.display_interval == 0:
                 if self.graph:
+                    # TODO: Implement other loss function as well. % incorrect cases.
                     self.graph.update(self.error_history, self.validation_history)
                 if self.live_hinton_modules:
                     self.display_hinton_module(results[monitored], epoch)
@@ -135,6 +150,9 @@ class Trainer():
         else:        return results[0]               # results[1] is error
 
     def mapping(self, cases, number_of_cases=10):
+        if not self.monitored_modules:
+            print("No monitored modules given in json config file. Cannot perform mapping")
+            return
         self._reopen_current_session()
 
         input_vectors = []
@@ -148,7 +166,7 @@ class Trainer():
         self._draw_hinton_graph(results[2], number_of_cases)
 
         # Drawing dendrograms:
-        self._draw_dendrograms(input_vectors, results[2])
+        self._draw_dendrograms(features=results[2], labels=input_vectors)
 
         self._save_session_params(session=self.session)
         self._close_session(self.session)
@@ -206,12 +224,12 @@ class Trainer():
     def _draw_dendrograms(self, features, labels):
         from downing_code.tflowtools import dendrogram
         import matplotlib.pyplot as PLT
-        for i, monitored in enumerate(labels):
+        for i, monitored in enumerate(features):
             module_name = self.monitored_modules[i].name
 
             if any(word in module_name for word in ["in", "bias", "out"]):
                 self.dendrogram_figures.append(PLT.figure())
-                dendrogram(features, labels=monitored, figure=self.dendrogram_figures[-1], title=module_name)
+                dendrogram(features=monitored, labels=labels, figure=self.dendrogram_figures[-1], title=module_name)
 
     def _initialize_graphics(self):
         """ Creates the list of "matplotlib.pyplot.Figure" to be used with the hinton diagrams. """

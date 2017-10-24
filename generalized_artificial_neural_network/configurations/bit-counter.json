@@ -3,23 +3,22 @@
       "input_vector_size": 15,
       "optimizer": {
          "algorithm": "SGD",
-         "learning_rate": 0.4,
+         "learning_rate": 0.6,
          "locking": false
       },
       "hidden_activation":1,
-      "validation_test_interval":100,
-      "output_activation": 0,
-      "use_softmax":false,
-      "network_dimensions":[ 10, 20, 30, 16 ],
+      "output_activation": 4,
+      "network_dimensions":[ 30, 16 ],
       "cost_function": 0,
+      "validation_test_interval":100,
       "weight_range":{
          "upper": 0.5,
          "lower":-0.5
       }
    },
    "run_configuration":{
-      "map-batch-size":10,
-      "mini-batch-size":100,
+      "in_top_k": true,
+      "mini-batch-size": 20,
       "epochs": 4000
    },
    "visualisation":{
@@ -29,7 +28,7 @@
       "display_interval":100,
       "map_layers":[],
       "probe_layers":[ {
-         "placement": 2,
+         "placement": 0,
          "component": "out",
          "points_of_interest": [
             "hist", "avg"

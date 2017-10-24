@@ -418,8 +418,9 @@ def gen_dim_reduced_data(feature_array,target_size,eigen_values,eigen_vectors):
 # mode = single, average, complete, centroid, ward, median
 # metric = euclidean, cityblock (manhattan), hamming, cosine, correlation ... (see matplotlib distance.pdist for all 23)
 def dendrogram(features,labels,figure, metric='euclidean',mode='average',ax=None,title='Dendrogram',orient='top',lrot=90.0):
+    labels =[ bits_to_str(label) for label in labels]
     ax = ax if ax else PLT.gca()
-    cluster_history = SCH.linkage(features,method=mode,metric=metric)
+    cluster_history = SCH.linkage(features, method=mode,metric=metric)
     SCH.dendrogram(cluster_history,labels=labels,orientation=orient,leaf_rotation=lrot)
     ax.set_ylabel(metric + ' distance')
     ax.set_title(title)

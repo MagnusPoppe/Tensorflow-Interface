@@ -1,7 +1,11 @@
 {
    "network_configuration":{
       "input_vector_size": 16,
-      "optimizer":0,
+      "optimizer": {
+         "algorithm": "SGD",
+         "learning_rate": 0.4,
+         "locking": false
+      },
       "hidden_activation":1,
       "learning_rate":0.075,
       "validation_test_interval":100,
@@ -18,14 +22,15 @@
       }
    },
    "run_configuration":{
-      "map-batch-size":10,
+      "in_top_k":false,
       "mini-batch-size":16,
-      "epochs":10000
+      "epochs":2000
    },
    "visualisation":{
       "map_dendrograms":false,
       "display_interval":100,
       "map_layers":[
+         {"placement":0, "component": "out"},
          {"placement":1, "component": "out"}
       ],
       "probe_layers": []

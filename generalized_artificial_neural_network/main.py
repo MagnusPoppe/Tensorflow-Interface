@@ -26,43 +26,65 @@ def mark_the_selected_modules_for_probing(configuration, coach):
 def input_number(text:str) -> int:
     epochs = input("\t"+text)
     while not epochs.isdigit():
-        print("\"" + epochs + "\" is no a number. Write a number!")
+        print("\"" + epochs + "\" is not a number. Write a number!")
         epochs = input("\t"+text)
     return int(epochs)
 
-def create_artificial_neural_network_from_config_file() -> Trainer:
+def input_json_file(text:str="file: configurations/") -> str:
+    print(os.listdir("configurations/"))
+    file = input("\tfile: configurations/")
+    while file[-5:] != ".json":
+        print("\"" + file + "\" is no a json file!")
+        epochs = input("\t"+text)
+    return file
+
+def create_artificial_neural_network_from_config_file(file) -> Trainer:
     configuration_file = os.path.join("configurations", file)
     coach = Trainer(configuration_file)
     mark_the_selected_modules_for_probing(configuration=coach.config, coach=coach)
     mark_the_selected_modules_for_monitoring(configuration=coach.config, coach=coach)
     return coach
 
+def create_and_run(file, displaymode):
+    coach = create_artificial_neural_network_from_config_file(file)
+    coach.run(epochs=coach.config.epochs, display_graph=displaymode, hinton_plot=False)
+    # coach.mapping(coach.config.manager.training_cases, number_of_cases=10)
+    return coach
+
 ## Setup:
 displaymode = True
-file = "winequality.json" # "bit-counter.json"  # "glass.json" #"one-hot.json"
 
+#### TRAINED CASES:
+# "one-hot.json"
+# "parity.json"
+file =  "segment-counter.json"# "winequality.json" # "bit-counter.json"  # "glass.json" #
+coach = None
 for arg in sys.argv:
     if arg in ["-r", "remote"]: displaymode=False
     if ".json" in arg:          file=arg
 
-coach = create_artificial_neural_network_from_config_file()
-coach.run(epochs=coach.config.epochs, display_graph=displaymode, hinton_plot=False)
+if file:
+    coach = create_and_run(file, displaymode)
 
 run = True
 while run:
-    x = input(">>> ")
+    x = input(">>> ").strip()
 
+    # System:
     if x in ["q", "quit", "exit"]: run = False
+    elif x in ["new ann"]: coach = create_and_run(input_json_file(), displaymode)
 
-    # Visuals:
-    elif x in ["tb", "tensorboard"]: coach.run_tensorboard()
-    elif x in ["display hinton history", "dhh"]: coach.display_hinton_graph_from_training_history()
-    elif x in ["mapping"]: coach.mapping(coach.config.manager.testing_cases, number_of_cases=input_number("map batch size="))
-    elif x in ["close windows", "close"]: coach.close_all_matplotlib_windows()
+    if coach:
+        # Visuals:
+        if x in ["tb", "tensorboard"]: coach.run_tensorboard()
+        # TODO: Display biases and weigths. check out display matrix in tftools. note, also imlement in config file
+        elif x in ["display hinton history", "dhh"]: coach.display_hinton_graph_from_training_history()
+        elif x in ["mapping"]: coach.mapping(coach.config.manager.training_cases, input_number("map batch size="))
+        elif x in ["close windows", "close"]: coach.close_all_matplotlib_windows()
 
-    # Stats:
-    elif x in ["info","settings", "i"]: coach.config.print_summary()
-    elif x == "run more": coach.run_more(input_number("epochs="))
-    elif x in "run tests": coach.run_all_tests(renew_session=True, in_top_k=True)
-    else: print("Unknown command.")
+        # Stats:
+        elif x in ["info","settings", "i"]: coach.config.print_summary()
+        elif x == "run more": coach.run_more(input_number("epochs="))
+        elif x in "run tests": coach.run_all_tests(renew_session=True, in_top_k=True)
+        else: print("Unknown command.")
 
