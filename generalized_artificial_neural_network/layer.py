@@ -62,7 +62,7 @@ class Layer():
             name=self.name + '_output'
         )
 
-    def get_variable(self,type):  # type = (in,out,wgt,bias)
+    def get_variable(self, type):  # type = (in,out,wgt,bias)
         return {
             'in': self.input_vector,
             'out': self.output_vector,

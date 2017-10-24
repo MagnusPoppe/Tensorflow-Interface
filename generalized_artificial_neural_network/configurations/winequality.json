@@ -1,33 +1,44 @@
 {
    "network_configuration":{
-      "optimizer":0,
-      "momentum":0.25,
-      "learning_rate":0.05,
+      "input_vector_size": 11,
+      "optimizer": {
+         "algorithm": "MOMENTUM",
+         "learning_rate":0.3,
+         "momentum": 0.5,
+         "locking": false,
+         "use_nestrov": false
+      },
       "hidden_activation":1,
-      "use_softmax":false,
-      "output_activation":3,
-      "validation_test_interval": 25,
-      "network_dimensions":[ 11, 40, 20, 20, 6 ],
-      "cost_function":0,
+      "validation_test_interval":100,
+      "output_activation": 0,
+      "network_dimensions":[ 90, 50, 25, 6 ],
+      "cost_function": 0,
       "weight_range":{
-         "upper":1,
+         "upper": 1,
          "lower":-1
       }
    },
    "run_configuration":{
       "map-batch-size":10,
-      "mini-batch-size":100,
-      "epochs":1000
+      "mini-batch-size":750,
+      "epochs": 3000
    },
    "visualisation":{
+      "display_biases":false,
+      "display_weights":false,
       "map_dendrograms":false,
-      "display_interval":25,
+      "display_interval":100,
       "map_layers":[
-         {"placement": 3, "component": "out"}
-      ],
-      "probe_layers": [
          {
-         "placement": 3,
+            "placement": 2,
+            "component": "out"
+         },{
+            "placement": 0,
+            "component": "in"
+         }
+      ],
+      "probe_layers":[ {
+         "placement": 2,
          "component": "out",
          "points_of_interest": [
             "hist", "avg"
