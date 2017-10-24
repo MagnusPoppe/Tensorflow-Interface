@@ -83,6 +83,17 @@ class NetworkConfiguration:
             number_of_classes=classes
         )
 
+    def print_summary(self):
+        print("\nSUMMARY OF CONFIGURATION: ")
+        print("\tDataset used: " + self.dataset)
+        print("\tNetwork dimensions: " + str(self.network_dimensions))
+        print("\tOptimizer used: " + str(self.optimizer))
+        print("\tSettings: " + str(self.optimizer_options))
+        print("\tActivation functions: ")
+        print("\t\tHidden layers: " + str(self.hidden_activation))
+        print("\t\tOutput layer:  " + str(self.output_activation))
+        print("\tCost function: " + str(self.cost_function))
+
     def validate(self):
         """ Checks the different parameters for errors and bad values. """
 

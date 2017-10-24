@@ -52,5 +52,6 @@ while run:
 
     if x in ["q", "quit", "exit"]: run = False
     elif x in ["tb", "tensorboard"]: coach.run_tensorboard()
+    elif x in ["info","settings", "i"]: coach.config.print_summary()
     elif x == "run more": pass
     elif x in "run tests": coach.test(coach.config.manager.get_testing_cases())
