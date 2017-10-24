@@ -21,7 +21,7 @@
    "run_configuration":{
       "map-batch-size":10,
       "mini-batch-size":750,
-      "epochs": 3000
+      "epochs": 300
    },
    "visualisation":{
       "display_biases":false,
@@ -40,6 +40,11 @@
       "probe_layers":[ {
          "placement": 2,
          "component": "out",
+         "points_of_interest": [
+            "hist", "avg"
+         ]}, {
+         "placement": 1,
+         "component": "wgt",
          "points_of_interest": [
             "hist", "avg"
          ]}

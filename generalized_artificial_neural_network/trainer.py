@@ -30,7 +30,6 @@ class Trainer():
         # Graphics
         self.hinton_figures = []     # list of matplotlib.pyplot.Figure
         self.dendrogram_figures = [] # list of matplotlib.pyplot.Figure
-        # TODO: Implement hinton figures
         # TODO: Implement dendrograms
 
         if display_graph:
@@ -73,9 +72,9 @@ class Trainer():
             # Looping through each case, running with tensorflow.
             for cases_start in range(0, len(cases), self.config.mini_batch_size):
                 # Setting the input and the desired target for this case.:
-                input_vector  = [case[0] for case in cases[cases_start : (cases_start + self.config.mini_batch_size)]]
-                target_vector = [case[1] for case in cases[cases_start : (cases_start + self.config.mini_batch_size)]]
-                feeder_dictionary = {self.ann.input: input_vector, self.ann.target: target_vector}
+                feeder_dictionary = self._convert_to_feeder_dictionary(
+                    cases[cases_start : (cases_start + self.config.mini_batch_size) ]
+                )
 
                 # Actually running:
                 results = self.session.run( parameters, feed_dict=feeder_dictionary )
@@ -106,12 +105,8 @@ class Trainer():
 
         # Loading up all data into the feeder dictionary. That way only one call to
         # session.run() is needed for entire test. This is faster.
-        input_vectors = []
         target_vectors = []
-        for case in cases:
-            input_vectors += [case[0]]
-            target_vectors += [case[1]]
-        feeder_dictionary = {self.ann.input: input_vectors, self.ann.target: target_vectors}
+        feeder_dictionary = self._convert_to_feeder_dictionary(cases, target_vectors=target_vectors)
 
         # Selecting error function:
         if in_top_k:
@@ -126,6 +121,29 @@ class Trainer():
         results = self.session.run( parameters, feed_dict=feeder_dictionary )
         if in_top_k: return 100*(results[0] /len(cases))  # results[1] is error. Scaling to fit.
         else:        return results[0]               # results[1] is error
+
+    def mapping(self, cases):
+        input_vectors = []
+        feeder_dictionary = self._convert_to_feeder_dictionary(cases[:10], input_vectors=input_vectors)
+
+        # Setting the parameters for the session.run.
+        parameters = [self.ann.error, self.ann.predictor, self.monitored_modules]
+        results = self.session.run( parameters, feed_dict=feeder_dictionary )
+
+        from downing_code.tflowtools import dendrogram
+        import matplotlib.pyplot as PLT
+        for i, monitored in enumerate(results[2]):
+            if any(word in self.monitored_modules[i].name for word in ["in", "bias", "out"]):
+                self.dendrogram_figures.append(PLT.figure())
+                dendrogram(features=input_vectors, labels=monitored, figure=self.dendrogram_figures[-1])
+
+    def _convert_to_feeder_dictionary(self, cases, input_vectors=None, target_vectors=None):
+        input_vectors  = [] if input_vectors  is None else input_vectors
+        target_vectors = [] if target_vectors is None else target_vectors
+        for case in cases:
+            input_vectors += [case[0]]
+            target_vectors += [case[1]]
+        return {self.ann.input: input_vectors, self.ann.target: target_vectors}
 
     def monitor_module(self, module_index, type='wgt'):
         """

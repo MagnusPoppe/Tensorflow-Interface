@@ -40,10 +40,8 @@ class NeuralNetwork:
 
         # Creating the hidden layers:
         for i, next_vector_size in enumerate(self.config.network_dimensions):
-            if i != output_layer:
-                activation = self.config.hidden_activation
-            else:
-                activation = self.config.output_activation
+            if i != output_layer: activation = self.config.hidden_activation
+            else:                 activation = self.config.output_activation
 
             # Creating the actual layer:
             layer = Layer(self, i, previous_vector, previous_vector_size, next_vector_size, activation,
