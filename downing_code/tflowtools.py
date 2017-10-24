@@ -423,7 +423,10 @@ def dendrogram(features,labels,figure, metric='euclidean',mode='average',ax=None
     SCH.dendrogram(cluster_history,labels=labels,orientation=orient,leaf_rotation=lrot)
     ax.set_ylabel(metric + ' distance')
     ax.set_title(title)
-    # PLT.tight_layout() unknown bug.
+    # figure.subplots_adjust(bottom=0)
+    # figure.subplots_adjust(top=1)
+    # figure.subplots_adjust(right=2)
+    # figure.subplots_adjust(left=0)
+    # PLT.tight_layout() # unknown bug.
     figure.canvas.draw()
     PLT.pause(0.002)
-    sleep(0.002)
