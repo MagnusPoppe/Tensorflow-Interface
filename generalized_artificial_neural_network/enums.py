@@ -15,17 +15,11 @@ class ActivationFunction(Enum):
     """
     SIGMOID = 0
     RECTIFIED_LINEAR = 1
-    EXPONENTIAL_LINEAR = 2
     HYPERBOLIC_TANGENT = 3
     SOFTMAX = 4
-    SOFTPLUS = 5
-    SOFTSIGN = 6
-    DROPOUT = 7
 
 class CostFunction(Enum):
     MEAN_SQUARED_ERROR = 0
-    CROSS_ENTROPY_TENSORFLOW_DEFAULT = 1
-    CROSS_ENTROPY_FORMULA = 2
 
 class Optimizer(Enum):
     """
@@ -67,6 +61,31 @@ class Optimizer(Enum):
     NAG does the same thing but in another order: at first we make a big jump based on our stored information,
     and then we calculate the gradient and make a small correction. This seemingly irrelevant change gives
     significant practical speedups.
+
+    Examples for configuring optimizer in json:
+    For GradientDecentOptimizer
+      "optimizer": {
+         "algorithm": "SGD",
+         "learning_rate": 0.4,
+         "locking": false
+      },
+    For ADAM
+      "optimizer": {
+         "algorithm": "ADAM",
+         "learning_rate":0.4,
+         "Beta1 (exponential decay rate for the 1st moment estimates)": 0.9,
+         "Beta2 (exponential decay rate for the 2st moment estimates)": 0.999,
+         "epsilon": 1e-08,
+         "locking": false
+      },
+    For Momentum
+      "optimizer": {
+         "algorithm": "MOMENTUM",
+         "learning_rate":0.4,
+         "momentum": 0.1,
+         "locking": false,
+         "use_nestrov": true
+      },
     """
     GRADIENT_DECENT = 0             # tf.train.GradientDescentOptimizer
     ADAGRADDA = 1                   # tf.train.AdagradDAOptimizer

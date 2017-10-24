@@ -47,17 +47,14 @@ class NetworkConfiguration:
         # NETWORK CONFIGURATION:
         self.input_vector_size          = input["network_configuration"]['input_vector_size']
         self.network_dimensions         = input["network_configuration"]['network_dimensions']
-        self.learning_rate              = input["network_configuration"]['learning_rate']
         self.validation_interval        = input["network_configuration"]['validation_test_interval']
         self.lower_bound_weight_range   = input["network_configuration"]['weight_range']['lower']
         self.upper_bound_weight_range   = input["network_configuration"]['weight_range']['upper']
-        # self.softmax_outputs            = input["network_configuration"]["use_softmax"]
         self.hidden_activation          = ActivationFunction(input["network_configuration"]['hidden_activation'])
         self.output_activation          = ActivationFunction(input["network_configuration"]['output_activation'])
         self.cost_function              = CostFunction(input["network_configuration"]['cost_function'])
-        self.optimizer                  = Optimizer(input["network_configuration"]["optimizer"])
-        if "momentum" in input["network_configuration"]: self.momentum = input["network_configuration"]['momentum']
-        else:                                            self.momentum = 0
+        self.optimizer_options          = input["network_configuration"]["optimizer"]
+        self.optimizer                  = self.select_optimizer(self.optimizer_options["algorithm"])
 
         # RUN CONFIGURATION
         self.mini_batch_size            = input["run_configuration"]["mini-batch-size"]
@@ -113,9 +110,6 @@ class NetworkConfiguration:
         if self.cost_function == 1 and self.output_activation != 4:
             raise ValueError("Using cross entropy can only be used when output activation function is softmax")
 
-        if self.momentum == 0 and self.optimizer.value in [5,8,9,10]:
-            raise ValueError("Momentum needs to be set when your optimizer is momentum-based.")
-
         if self.epochs <= self.validation_interval:
             raise ValueError("Having a validation interval that is equal or bigger that epochs can cause bugs.")
 
@@ -166,3 +160,14 @@ class NetworkConfiguration:
                 "display_biases": self.display_biases
             }
         }
+
+    def select_optimizer(self, param):
+        if isinstance(param, str):
+            if param.lower() == "adam":
+                return Optimizer.ADAM
+            if param.lower() == "momentum":
+                return Optimizer.MOMENTUM
+            if param.lower() in ["sgd", "gradient decent"]:
+                return Optimizer.GRADIENT_DECENT
+        else:
+            return Optimizer(param)

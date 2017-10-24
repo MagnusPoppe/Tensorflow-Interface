@@ -1,3 +1,4 @@
+from generalized_artificial_neural_network.enums import Optimizer
 from generalized_artificial_neural_network.layer import Layer
 from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
 
@@ -39,7 +40,7 @@ class NeuralNetwork:
 
         # Creating the hidden layers:
         for i, next_vector_size in enumerate(self.config.network_dimensions):
-            if i == output_layer:
+            if i != output_layer:
                 activation = self.config.hidden_activation
             else:
                 activation = self.config.output_activation
@@ -69,7 +70,29 @@ class NeuralNetwork:
         self.error = tf.reduce_mean(tf.square(self.target - self.output), name="Mean-squared-error")
 
         # This is the function used to optimize the weights of the layers in the network.
-        self.optimizer = tf.train.GradientDescentOptimizer(self.config.learning_rate)
+        if self.config.optimizer == Optimizer.GRADIENT_DECENT:
+            self.optimizer = tf.train.GradientDescentOptimizer(
+                learning_rate=self.config.optimizer_options["learning_rate"],
+                use_locking=self.config.optimizer_options["locking"]
+            )
+        elif self.config.optimizer == Optimizer.MOMENTUM:
+            self.optimizer = tf.train.MomentumOptimizer(
+                learning_rate=self.config.optimizer_options["learning_rate"],
+                momentum=self.config.optimizer_options["momentum"],
+                use_nesterov=self.config.optimizer_options["use_nestrov"],
+                use_locking=self.config.optimizer_options["locking"]
+            )
+        elif self.config.optimizer == Optimizer.ADAM:
+            self.optimizer = tf.train.AdamOptimizer(
+                learning_rate=self.config.optimizer_options["learning_rate"],
+                beta1=self.config.optimizer_options["Beta1 (exponential decay rate for the 1st moment estimates)"],
+                beta2=self.config.optimizer_options["Beta2 (exponential decay rate for the 2st moment estimates)"],
+                epsilon=self.config.optimizer_options["epsilon"],
+                use_locking=self.config.optimizer_options["locking"]
+            )
+        else: raise Exception("Invalid optimizer. Use a different optimizer.")
         self.trainer   = self.optimizer.minimize(self.error, name="Backpropogation")
 
-
+    def generate_probe(self, module_index, type, spec):
+        """ Probed variables are to be displayed in the Tensorboard. """
+        self.hidden_layers[module_index].generate_probe(type,spec)

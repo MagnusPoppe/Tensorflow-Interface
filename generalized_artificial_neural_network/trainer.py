@@ -35,13 +35,15 @@ class Trainer():
         else: self.graph = None
 
 
-    def train(self, epochs):
+    def train(self, epochs, monitored_modules=None, probed_modules=None):
         """
         Trains the network on the casemanager training cases.
         :param epochs: Number of times to train on the whole set of cases
         """
         # TODO: Implement monitored variables
         # TODO: Implement probes variables
+
+        probed_modules = tf.summary.merge_all()
 
         # This is a counter over how many cases has run through the network, total.
         steps = 0
@@ -54,14 +56,16 @@ class Trainer():
             error = 0
 
             # Looping through each case, running with tensorflow.
-            for case in cases:
+            for cases_start in range(0, len(cases), self.config.mini_batch_size): # TODO: Implement minibatch
                 # Setting the input and the desired target for this case.:
-                input_vector  = case[0]
-                target_vector = case[1]
-                feeder_dictionary = {self.ann.input: [input_vector], self.ann.target: [target_vector]}
+                input_vector  = [case[0] for case in cases[cases_start : (cases_start + self.config.mini_batch_size)]]
+                target_vector = [case[1] for case in cases[cases_start : (cases_start + self.config.mini_batch_size)]]
+                feeder_dictionary = {self.ann.input: input_vector, self.ann.target: target_vector}
 
                 # Setting the parameters for the session.run.
                 parameters = [self.ann.trainer, self.ann.error, self.ann.output]
+                if monitored_modules is not None: parameters += monitored_modules
+                if probed_modules is not None:    parameters += [probed_modules]
 
                 # Actually running:
                 results = self.session.run( parameters, feed_dict=feeder_dictionary )
@@ -136,3 +140,41 @@ class Trainer():
         # Initializing variables:
         session.run(tf.global_variables_initializer())
         return session
+
+    def _close_session(self, session: tf.Session):
+        session.probe_stream.close()
+        session.close()
+
+    def _copy_session(self, session):
+        session = session if session else self.session
+        copied_session = tf.Session()
+        copied_session.probe_stream = session.probe_stream
+        copied_session.probe_stream.reopen()
+        copied_session.viewdir = session.viewdir
+        return copied_session
+
+    def _reopen_current_session(self):
+        self.current_session = self._copy_session(self.current_session)  # Open a new session with same tensorboard stuff
+        self.current_session.run(tf.global_variables_initializer())
+        self._restore_session_params()  # Reload old weights and biases to continued from where we last left off
+
+    def _save_session_params(self, spath='netsaver/my_saved_session', sess=None, step=0):
+        session = sess if sess else self.current_session
+        state_vars = []
+        for m in self.monitored_modules:
+            vars = [m.getvar('wgt'), m.getvar('bias')]
+            state_vars = state_vars + vars
+        self.state_saver = tf.train.Saver(state_vars)
+        self.saved_state_path = self.state_saver.save(session, spath, global_step=step)
+
+
+    def _restore_session_params(self, path=None, sess=None):
+        spath = path if path else self.saved_state_path
+        session = sess if sess else self.current_session
+        self.state_saver.restore(session, spath)
+
+    def run_tensorboard(self, session: tf.Session =None):
+        session = session if session else self.session
+        session.probe_stream.flush()
+        session.probe_stream.close()
+        os.system('tensorboard --logdir=' + session.viewdir)

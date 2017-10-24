@@ -1,6 +1,9 @@
 import tensorflow as tf
 import numpy as np
 
+from generalized_artificial_neural_network.enums import ActivationFunction
+
+
 class Layer():
     """
     Builds up the Layer.
@@ -45,11 +48,40 @@ class Layer():
             trainable=True
         )
 
-        # TODO: Implement more activation functions:
-        activation_function = tf.nn.relu
+        if activation == ActivationFunction.RECTIFIED_LINEAR:       activation_function = tf.nn.relu
+        elif activation == ActivationFunction.SIGMOID:              activation_function = tf.nn.sigmoid
+        elif activation == ActivationFunction.SOFTMAX:              activation_function = tf.nn.softmax
+        elif activation == ActivationFunction.HYPERBOLIC_TANGENT:   activation_function = tf.nn.tanh
+        # elif activation == ActivationFunction.EXPONENTIAL_LINEAR:   activation_function = tf.nn.elu
+        else:
+            raise Exception("Unknown activation function. Select a valid one!")
 
         # Creating the output layer
         self.output_vector = activation_function(
             tf.matmul(self.input_vector, self.weight_matrix) + self.bias_vector,
             name=self.name + '_output'
         )
+
+    def get_variable(self,type):  # type = (in,out,wgt,bias)
+        return {
+            'in': self.input_vector,
+            'out': self.output_vector,
+            'wgt': self.weight_matrix,
+            'bias': self.bias_vector
+        }[type]
+
+    # spec, a list, can contain one or more of (avg,max,min,hist); type = (in, out, wgt, bias)
+    def generate_probe(self,type,spec):
+        var = self.get_variable(type)
+        base = self.name +'_'+type
+        with tf.name_scope('probe_'):
+            if ('avg' in spec) or ('stdev' in spec):
+                avg = tf.reduce_mean(var)
+            if 'avg' in spec:
+                tf.summary.scalar(base + '/avg/', avg)
+            if 'max' in spec:
+                tf.summary.scalar(base + '/max/', tf.reduce_max(var))
+            if 'min' in spec:
+                tf.summary.scalar(base + '/min/', tf.reduce_min(var))
+            if 'hist' in spec:
+                tf.summary.histogram(base + '/hist/',var)
