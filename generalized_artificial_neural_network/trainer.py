@@ -114,13 +114,14 @@ class Trainer():
         else:        return results[1]               # results[1] is error
 
     def _progress_print(self, epoch, error):
-
         print("Epoch=" + "0"*(len(str(self.config.epochs)) - len(str(epoch))) + str(epoch) + "    "
               "Error=" + str(error) + "    "
               "Validation=" + (str(self.validation_history[-1][1]) if self.validation_history else "0"))
+
     def _create_in_top_k_operator(self, logits, labels, k=1):
         correct = tf.nn.in_top_k(tf.cast(logits,tf.float32), labels, k) # Return number of correct outputs
         return tf.reduce_sum(tf.cast(correct, tf.int32))
+
     def _create_session(self, directory='probeview') -> tf.Session:
         # Clearing the output folders for previous output:
         os.system('rm ' + directory + '/events.out.*')
@@ -135,37 +136,3 @@ class Trainer():
         # Initializing variables:
         session.run(tf.global_variables_initializer())
         return session
-
-
-if __name__ == '__main__':
-    file = "bit-counter.json" #"glass.json" #"one-hot.json"
-    configuration_file = os.path.join("configurations", file)
-
-    coach = Trainer(configuration_file, display_graph=False)
-    coach.train(epochs=coach.config.epochs)
-    print("TRAINING COMPLETE!")
-    print("\tERROR AFTER TRAINING: " + str(coach.error_history[-1][1]))
-
-    # Running tests:
-    training_score   = coach.test(coach.config.manager.get_training_cases(),   in_top_k=True)
-    validation_score = coach.test(coach.config.manager.get_validation_cases(), in_top_k=True)
-    testing_score    = coach.test(coach.config.manager.get_testing_cases(),    in_top_k=True)
-
-    print("PERFORMING TESTS:")
-    print("\tSCORE ON TRAINING CASES:   " + str(training_score))
-    print("\tSCORE ON VALIDATION CASES: " + str(validation_score))
-    print("\tSCORE ON TESTING CASES:    " + str(testing_score))
-
-    run = True
-    waited = 0
-    while run:
-        x = input(">>> ")
-
-        if x in ["q", "quit"]:
-            run = False
-
-        elif x == "run more":
-            pass
-
-        elif x in "run tests":
-            coach.test(coach.config.manager.get_testing_cases())

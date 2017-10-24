@@ -3,11 +3,11 @@
       "input_vector_size": 15,
       "optimizer": 0,
       "hidden_activation":1,
-      "learning_rate":0.05,
+      "learning_rate":0.075,
       "validation_test_interval":100,
       "output_activation": 3,
       "use_softmax":false,
-      "network_dimensions":[ 20, 20, 20, 16 ],
+      "network_dimensions":[ 30, 20, 10, 16 ],
       "cost_function": 0,
       "weight_range":{
          "upper": 0.1,
@@ -17,7 +17,7 @@
    "run_configuration":{
       "map-batch-size":1,
       "mini-batch-size":10,
-      "epochs": 5000
+      "epochs": 1000
    },
    "visualisation":{
       "display_biases":false,
