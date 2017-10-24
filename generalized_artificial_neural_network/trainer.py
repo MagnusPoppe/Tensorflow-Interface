@@ -12,13 +12,12 @@ from generalized_artificial_neural_network.network_configuration import NetworkC
 
 class Trainer():
 
-    def __init__(self, file:str, session:tf.Session=None, display_graph:bool=True):
+    def __init__(self, file:str, session:tf.Session=None, display_graph:bool=True, hinton_plot:bool=False):
 
         if not session:
 
             self.config = NetworkConfiguration(file)
             self.ann = NeuralNetwork(self.config)
-
             # Needs to be set after the network is configured.
             self.session = self._create_session()
 
@@ -26,16 +25,24 @@ class Trainer():
         self.error_history = []
         self.validation_history = []
 
+        # Graphics
+        if hinton_plot: self.hinton_figures = [None]
+        else: self.hinton_figures = None
+
         if display_graph:
             from generalized_artificial_neural_network.live_graph import LiveGraph
             self.graph = LiveGraph(graph_title="Error", x_title="Epochs", y_title="Error", epochs=self.config.epochs)
         else: self.graph = None
+
 
     def train(self, epochs):
         """
         Trains the network on the casemanager training cases.
         :param epochs: Number of times to train on the whole set of cases
         """
+        # TODO: Implement monitored variables
+        # TODO: Implement probes variables
+
         # This is a counter over how many cases has run through the network, total.
         steps = 0
 
@@ -54,7 +61,7 @@ class Trainer():
                 feeder_dictionary = {self.ann.input: [input_vector], self.ann.target: [target_vector]}
 
                 # Setting the parameters for the session.run.
-                parameters = [self.ann.trainer, self.ann.error]
+                parameters = [self.ann.trainer, self.ann.error, self.ann.output]
 
                 # Actually running:
                 results = self.session.run( parameters, feed_dict=feeder_dictionary )
@@ -69,6 +76,9 @@ class Trainer():
             # Perform validation test if interval:
             if epoch % self.config.validation_interval == 0:
                 self.validation_history += [(epoch, self.test(cases=self.config.manager.get_validation_cases()))]
+                if self.hinton_figures:
+                    from downing_code.tflowtools import hinton_plot
+                    hinton_plot(self.ann.output, self.hinton_figures[0])
 
             # Printing status update:
             if epoch % self.config.display_interval == 0:
@@ -77,6 +87,9 @@ class Trainer():
                 self._progress_print(epoch, error)
 
     def test(self, cases:list, in_top_k=False):
+        # TODO: Implement monitored variables
+        # TODO: Implement probes variables
+
         # Loading up all data into the feeder dictionary. That way only one call to
         # session.run() is needed for entire test. This is faster.
         input_vectors = []
@@ -130,12 +143,18 @@ if __name__ == '__main__':
 
     coach = Trainer(configuration_file, display_graph=False)
     coach.train(epochs=coach.config.epochs)
-    coach.test(coach.config.manager.get_testing_cases(), in_top_k=False)
+    print("TRAINING COMPLETE!")
+    print("\tERROR AFTER TRAINING: " + str(coach.error_history[-1][1]))
 
-    print("RUN COMPLETE!")
-    print("Error after training: " + str(coach.error_history[-1][1]))
+    # Running tests:
+    training_score   = coach.test(coach.config.manager.get_training_cases(),   in_top_k=True)
+    validation_score = coach.test(coach.config.manager.get_validation_cases(), in_top_k=True)
+    testing_score    = coach.test(coach.config.manager.get_testing_cases(),    in_top_k=True)
 
-    exit(0)
+    print("PERFORMING TESTS:")
+    print("\tSCORE ON TRAINING CASES:   " + str(training_score))
+    print("\tSCORE ON VALIDATION CASES: " + str(validation_score))
+    print("\tSCORE ON TESTING CASES:    " + str(testing_score))
 
     run = True
     waited = 0

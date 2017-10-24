@@ -45,6 +45,7 @@ class Layer():
             trainable=True
         )
 
+        # TODO: Implement more activation functions:
         activation_function = tf.nn.relu
 
         # Creating the output layer

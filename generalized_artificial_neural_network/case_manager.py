@@ -1,6 +1,6 @@
 import numpy as np
 import os
-import downing_code.tflowtools as TFT
+import downing_code.dataset_generator as TFT
 from datasets.mnist_zip.mnist_basics import gen_flat_cases
 
 
