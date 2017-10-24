@@ -19,7 +19,7 @@ class LiveGraph():
         if error_history:
             self.error_graph = self.plot(error_history, self.error_graph)
         if validation_history:
-            self.validation_graph = self.plot(validation_history, self.validation_graph, invert=True)
+            self.validation_graph = self.plot(validation_history, self.validation_graph, invert=False)
 
         self.figure.canvas.draw()
         PLT.pause(0.00025)

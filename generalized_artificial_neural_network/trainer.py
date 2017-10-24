@@ -56,7 +56,7 @@ class Trainer():
             error = 0
 
             # Looping through each case, running with tensorflow.
-            for cases_start in range(0, len(cases), self.config.mini_batch_size): # TODO: Implement minibatch
+            for cases_start in range(0, len(cases), self.config.mini_batch_size):
                 # Setting the input and the desired target for this case.:
                 input_vector  = [case[0] for case in cases[cases_start : (cases_start + self.config.mini_batch_size)]]
                 target_vector = [case[1] for case in cases[cases_start : (cases_start + self.config.mini_batch_size)]]
@@ -107,15 +107,15 @@ class Trainer():
         if in_top_k:
             labels = [ v.index(1) for v in target_vectors ]
             test_module = self._create_in_top_k_operator(self.ann.predictor, labels)
-        else: test_module = self.ann.predictor
+        else: test_module = self.ann.error
 
         # Setting the parameters for the session.run.
-        parameters = [test_module, self.ann.error]
+        parameters = [test_module, self.ann.predictor]
 
         # Actually running:
         results = self.session.run( parameters, feed_dict=feeder_dictionary )
-        if in_top_k: return results[1] / len(cases)  # results[1] is error. Scaling to fit.
-        else:        return results[1]               # results[1] is error
+        if in_top_k: return 100*(results[0] /len(cases))  # results[1] is error. Scaling to fit.
+        else:        return results[0]               # results[1] is error
 
     def _progress_print(self, epoch, error):
         print("Epoch=" + "0"*(len(str(self.config.epochs)) - len(str(epoch))) + str(epoch) + "    "

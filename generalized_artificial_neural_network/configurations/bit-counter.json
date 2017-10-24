@@ -10,7 +10,7 @@
       "validation_test_interval":100,
       "output_activation": 0,
       "use_softmax":false,
-      "network_dimensions":[ 10, 20, 10, 16 ],
+      "network_dimensions":[ 10, 20, 30, 16 ],
       "cost_function": 0,
       "weight_range":{
          "upper": 0.5,
@@ -19,8 +19,8 @@
    },
    "run_configuration":{
       "map-batch-size":10,
-      "mini-batch-size":10,
-      "epochs": 500
+      "mini-batch-size":50,
+      "epochs": 5000
    },
    "visualisation":{
       "display_biases":false,

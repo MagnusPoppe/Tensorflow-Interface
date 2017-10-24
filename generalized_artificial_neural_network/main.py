@@ -27,7 +27,7 @@ start_time = time.time()
 file = "bit-counter.json"  # "glass.json" #"one-hot.json"
 configuration_file = os.path.join("configurations", file)
 
-coach = Trainer(configuration_file, display_graph=False)
+coach = Trainer(configuration_file, display_graph=True)
 mark_the_selected_modules_for_probing(configuration=coach.config, coach=coach)
 
 coach.train(epochs=coach.config.epochs)
