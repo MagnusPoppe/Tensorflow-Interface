@@ -89,7 +89,8 @@ class NeuralNetwork:
                 use_locking=self.config.optimizer_options["locking"]
             )
         else: raise Exception("Invalid optimizer. Use a different optimizer.")
-        self.trainer   = self.optimizer.minimize(self.error, name="Backpropogation")
+
+        self.trainer = self.optimizer.minimize(self.error, name="Backpropogation")
 
     def generate_probe(self, module_index, type, spec):
         """ Probed variables are to be displayed in the Tensorboard. """

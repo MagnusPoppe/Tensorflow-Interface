@@ -58,7 +58,7 @@ displaymode = True
 # "one-hot.json"
 # "parity.json"
 # "segment-counter.json"
-file = "glass.json"
+file = "one-hot.json"
 coach = None
 for arg in sys.argv:
     if arg in ["-r", "remote"]: displaymode=False
@@ -75,7 +75,7 @@ while run:
     if x in ["q", "quit", "exit"]: run = False
     elif x in ["new ann"]: coach = create_and_run(input_json_file(), displaymode)
 
-    if coach:
+    elif coach:
         # Visuals:
         if x in ["tb", "tensorboard"]: coach.run_tensorboard()
         # TODO: Display biases and weigths. check out display matrix in tftools. note, also imlement in config file
@@ -88,4 +88,5 @@ while run:
         elif x == "run more": coach.run_more(input_number("epochs="))
         elif x in "run tests": coach.run_all_tests(renew_session=True, in_top_k=True)
         else: print("Unknown command.")
+    else: print("Unknown command.")
 

@@ -173,7 +173,8 @@ class Trainer():
         self._draw_hinton_graph(results[2], number_of_cases)
 
         # Drawing dendrograms:
-        self._draw_dendrograms(features=results[2], labels=input_vectors)
+        if number_of_cases > 1:
+            self._draw_dendrograms(features=results[2], labels=input_vectors)
 
         self._save_session_params(session=self.session)
         self._close_session(self.session)
@@ -216,10 +217,9 @@ class Trainer():
             self._draw_hinton_graph(history[1], history[0], hinton_plot)
 
     def _draw_hinton_graph(self, graph_results, epoch, imported_method=None):
-        if not imported_method:
-            from downing_code.tflowtools import hinton_plot
-            self._initialize_graphics()
+        if not imported_method: from downing_code.tflowtools import hinton_plot
         else: hinton_plot = imported_method
+        self._initialize_graphics()
         if self.hinton_figures and graph_results:
             # Local import to be able to run on server.
             for i in range(len(self.monitored_modules)):
@@ -243,6 +243,13 @@ class Trainer():
         import matplotlib.pyplot as PLT
         for i in range(len(self.monitored_modules)):
             self.hinton_figures.append(PLT.figure())
+
+    def close_all_matplotlib_windows(self):
+        import matplotlib.pyplot as PLT
+        PLT.close('all')
+        self.hinton_figures = []
+        self.dendrogram_figures = []
+        self.graph = None
 
     def _progress_print(self, epoch, error):
         print("Epoch=" + "0"*(len(str(self.config.epochs)) - len(str(epoch))) + str(epoch) + "    "
@@ -298,10 +305,6 @@ class Trainer():
         spath = path if path else self.saved_state_path
         session = session if session else self.session
         self.state_saver.restore(session, spath)
-
-    def close_all_matplotlib_windows(self):
-        import matplotlib.pyplot as PLT
-        PLT.close('all')
 
     def run_tensorboard(self, session: tf.Session =None):
         session = session if session else self.session

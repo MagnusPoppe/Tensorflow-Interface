@@ -6,9 +6,9 @@
          "learning_rate": 0.5,
          "locking": false
       },
-      "hidden_activation":1,
-      "output_activation":4,
-      "network_dimensions":[ 50, 25, 6 ],
+      "hidden_activation": 1,
+      "output_activation": 0,
+      "network_dimensions":[ 200, 50, 25, 6 ],
       "validation_test_interval":50,
       "cost_function":0,
       "weight_range":{
@@ -18,8 +18,8 @@
    },
    "run_configuration":{
       "in_top_k":true,
-      "mini-batch-size": 75,
-      "epochs": 1000
+      "mini-batch-size": 50,
+      "epochs": 2500
    },
    "visualisation":{
       "display_interval":50,
