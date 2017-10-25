@@ -20,6 +20,7 @@ class ActivationFunction(Enum):
 
 class CostFunction(Enum):
     MEAN_SQUARED_ERROR = 0
+    CROSS_ENTROPY = 1
 
 class Optimizer(Enum):
     """

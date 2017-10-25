@@ -1,41 +1,38 @@
 {
    "network_configuration":{
       "input_vector_size":784,
-      "optimizer": {
+       "optimizer": {
          "algorithm": "ADAM",
-         "learning_rate":0.0075,
+         "learning_rate":0.0007,
          "Beta1 (exponential decay rate for the 1st moment estimates)": 0.9,
          "Beta2 (exponential decay rate for the 2st moment estimates)": 0.999,
          "epsilon": 1e-08,
          "locking": false
       },
       "hidden_activation":1,
-      "validation_test_interval":100,
+      "validation_test_interval":5,
       "output_activation":4,
-      "network_dimensions":[ 784, 400, 200, 20, 10 ],
-      "cost_function":0,
+      "network_dimensions":[ 200, 50, 10 ],
+      "cost_function":1,
       "weight_range":{
          "upper":1,
-         "lower":0
+         "lower":-1
       }
    },
    "run_configuration":{
       "in_top_k":true,
       "mini-batch-size":250,
-      "epochs":500
+      "epochs":100
    },
    "visualisation":{
-      "display_biases":false,
-      "display_weights":false,
-      "map_dendrograms":false,
-      "display_interval":100,
+      "display_interval":5,
       "map_layers":[],
       "probe_layers": []
    },
    "dataset":{
-      "validation_fraction":0.1,
-      "test_fraction":0.1,
       "name":"mnist",
-      "total_case_fraction":0.1
+      "total_case_fraction":0.1,
+      "validation_fraction":0.1,
+      "test_fraction":0.1
    }
 }

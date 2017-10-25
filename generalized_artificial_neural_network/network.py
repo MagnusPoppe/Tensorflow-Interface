@@ -1,4 +1,4 @@
-from generalized_artificial_neural_network.enums import Optimizer
+from generalized_artificial_neural_network.enums import Optimizer, ActivationFunction, CostFunction
 from generalized_artificial_neural_network.layer import Layer
 from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
 
@@ -43,8 +43,21 @@ class NeuralNetwork:
             if i != output_layer: activation = self.config.hidden_activation
             else:                 activation = self.config.output_activation
 
+            if self.config.cost_function == CostFunction.CROSS_ENTROPY:
+                activation_function = tf.nn.softmax
+            elif activation == ActivationFunction.RECTIFIED_LINEAR:
+                activation_function = tf.nn.relu
+            elif activation == ActivationFunction.SIGMOID:
+                activation_function = tf.nn.sigmoid
+            elif activation == ActivationFunction.SOFTMAX:
+                activation_function = tf.nn.softmax
+            elif activation == ActivationFunction.HYPERBOLIC_TANGENT:
+                activation_function = tf.nn.tanh
+            # elif activation == ActivationFunction.EXPONENTIAL_LINEAR:   activation_function = tf.nn.elu
+            else: raise Exception("Unknown activation function. Select a valid one!")
+
             # Creating the actual layer:
-            layer = Layer(self, i, previous_vector, previous_vector_size, next_vector_size, activation,
+            layer = Layer(self, i, previous_vector, previous_vector_size, next_vector_size, activation_function,
                           self.config.lower_bound_weight_range, self.config.upper_bound_weight_range)
 
             # Setting the variables for the next layer to use:
@@ -65,8 +78,10 @@ class NeuralNetwork:
         self.predictor = self.output
 
         # The error function here is the "mean squared error". TODO: Cross entropy
-        self.error = tf.reduce_mean(tf.square(self.target - self.output), name="Mean-squared-error")
-
+        if self.config.cost_function == CostFunction.MEAN_SQUARED_ERROR:
+            self.error = tf.reduce_mean(tf.square(self.target - self.output), name="Mean-squared-error")
+        elif self.config.cost_function == CostFunction.CROSS_ENTROPY:
+            self.error = - tf.reduce_mean(tf.reduce_sum(self.target * tf.log(self.output), [1]),name='CROSS-ENTROPY-ERROR')
         # This is the function used to optimize the weights of the layers in the network.
         if self.config.optimizer == Optimizer.GRADIENT_DECENT:
             self.optimizer = tf.train.GradientDescentOptimizer(

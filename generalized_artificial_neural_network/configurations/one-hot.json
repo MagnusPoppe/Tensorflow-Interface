@@ -27,10 +27,11 @@
       "epochs":2000
    },
    "visualisation":{
-      "map_dendrograms":false,
+      "live-hinton-plot": true,
       "display_interval":100,
       "map_layers":[
-         {"placement":0, "component": "out"},
+         {"placement":0, "component": "in"},
+         {"placement":0, "component": "wgt"},
          {"placement":1, "component": "out"}
       ],
       "probe_layers": []

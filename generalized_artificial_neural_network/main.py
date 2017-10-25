@@ -79,7 +79,7 @@ displaymode = True
 # "yeast.json" - ustabil
 # "glass.json" - noe ustabil. 90 % < x < 98 % + 10 epoker kan gi mange ekstra prosent.
 # "bit-counter.json"
-file = "bit-counter.json"
+file = "mnist.json"
 coach = None
 for arg in sys.argv:
     if arg in ["-r", "remote"]: displaymode=False

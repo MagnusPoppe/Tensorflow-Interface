@@ -1,6 +1,6 @@
 import os
 from time import sleep, time
-
+import math
 import tensorflow as tf
 from numpy.core.multiarray import ndarray
 
@@ -50,7 +50,7 @@ class Trainer():
                                    y_title="Error",
                                    epochs=epochs+self.epochs_trained_on)
 
-        self.live_hinton_modules = hinton_plot
+        self.live_hinton_modules = self.config.hinton_plot
 
         # Training
         self.train(epochs)
@@ -66,7 +66,7 @@ class Trainer():
         self._reopen_current_session()
         self.run(epochs, display_graph, hinton_plot)
 
-    def train(self,epochs, average_error=False, live_training_accuracy=True):
+    def train(self,epochs, average_error=True, live_training_accuracy=True):
         """
         Trains the network on the casemanager training cases.
         :param epochs: Number of times to train on the whole set of cases
@@ -113,7 +113,7 @@ class Trainer():
                 self.steps += 1
 
             # Updating error history for the graph:
-            error = error / int(len(cases)/self.config.mini_batch_size) if average_error else error
+            error = (error / math.ceil(len(cases)/self.config.mini_batch_size)) if average_error else error
             self.error_history.append((epoch+self.epochs_trained_on, error))
 
             # Perform validation test if interval:

@@ -66,6 +66,9 @@ class NetworkConfiguration:
         self.map_layers                 = input["visualisation"]["map_layers"]
         self.probe_layers               = input["visualisation"]["probe_layers"]
 
+        try:             self.hinton_plot = input["visualisation"]["live-hinton-plot"]
+        except KeyError: self.hinton_plot = False
+
         classes = input["dataset"]["number_of_classes"] if self.dataset in ["yeast", "glass", "wine quality", "iris"] else 0
 
         if self.validation_interval == "half": self.validation_interval = self.epochs/2

@@ -24,13 +24,12 @@ class Layer():
     bias is added after the multiplication.
     """
 
-    def __init__(self, network, index, input_layer, in_neurons, out_neurons, activation, lower, upper):
+    def __init__(self, network, index, input_layer, in_neurons, out_neurons, activation_function, lower, upper):
         # Saving initial variables:
         self.network             = network
         self.input_vector        = input_layer
         self.in_neurons          = in_neurons
         self.out_neurons         = out_neurons
-        self.activation_function = activation
         self.index               = index
 
         # Name of module to be used with tensorboard and other visuals.
@@ -47,14 +46,6 @@ class Layer():
             name=self.name + '_bias',
             trainable=True
         )
-
-        if activation == ActivationFunction.RECTIFIED_LINEAR:       activation_function = tf.nn.relu
-        elif activation == ActivationFunction.SIGMOID:              activation_function = tf.nn.sigmoid
-        elif activation == ActivationFunction.SOFTMAX:              activation_function = tf.nn.softmax
-        elif activation == ActivationFunction.HYPERBOLIC_TANGENT:   activation_function = tf.nn.tanh
-        # elif activation == ActivationFunction.EXPONENTIAL_LINEAR:   activation_function = tf.nn.elu
-        else:
-            raise Exception("Unknown activation function. Select a valid one!")
 
         # Creating the output layer
         self.output_vector = activation_function(
