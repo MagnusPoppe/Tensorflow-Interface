@@ -76,7 +76,7 @@ displaymode = True
 # "parity.json"
 # "segment-counter.json"
 # "iris.json"
-file = "one-hot.json"
+file = "yeast.json"
 coach = None
 for arg in sys.argv:
     if arg in ["-r", "remote"]: displaymode=False

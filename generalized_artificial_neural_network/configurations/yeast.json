@@ -1,13 +1,18 @@
 {
    "network_configuration":{
-      "optimizer":9,
-      "momentum": 0.5,
+      "input_vector_size":7,
+      "optimizer": {
+         "algorithm": "ADAM",
+         "learning_rate":0.003,
+         "Beta1 (exponential decay rate for the 1st moment estimates)": 0.001,
+         "Beta2 (exponential decay rate for the 2st moment estimates)": 0.999,
+         "epsilon": 1e-08,
+         "locking": false
+      },
       "hidden_activation":1,
-      "learning_rate":0.001,
-      "validation_test_interval": 25,
       "output_activation": 4,
-      "use_softmax":false,
-      "network_dimensions":[ 8, 100, 75, 50, 10 ],
+      "validation_test_interval": 100,
+      "network_dimensions":[ 20, 100, 30, 10 ],
       "cost_function":0,
       "weight_range":{
          "upper":  1,
@@ -15,24 +20,21 @@
       }
    },
    "run_configuration":{
-      "map-batch-size":1,
-      "mini-batch-size":20,
-      "epochs": 1000
+      "in_top_k": true,
+      "mini-batch-size":150,
+      "epochs": 5000
    },
    "visualisation":{
-      "display_biases":false,
-      "display_weights":false,
-      "map_dendrograms":false,
-      "display_interval":25,
+      "display_interval":100,
       "map_layers":[
-         {"placement":1, "component": "weight"},
+         {"placement":1, "component": "wgt"},
          {"placement":2, "component": "bias"},
          {"placement":3, "component": "out"}
-      ]
+      ],
+      "probe_layers":[]
    },
    "dataset":{
       "validation_fraction": 0.1,
-      "steps_per_minibatch": 1,
       "test_fraction": 0.20,
       "name":"yeast",
       "normalize": false,
