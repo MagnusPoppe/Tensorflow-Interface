@@ -46,6 +46,8 @@ class CaseManager():
             return self._file_reader(os.path.join("..", "datasets", "glass.txt"), number_of_classes, normalize)
         if case == "yeast":
             return self._file_reader(os.path.join("..", "datasets", "yeast.txt"), number_of_classes, normalize)
+        if case == "iris":
+            return self._file_reader(os.path.join("..", "datasets", "iris","iris.data.txt"), number_of_classes, normalize)
         if case == "mnist":
             def mnist():
                 return gen_flat_cases(case_fraction=self.case_fraction)
@@ -83,12 +85,16 @@ class CaseManager():
             for item in raw_data:
                 # Slicing and dicing the raw input data
                 elements = item.strip("\n").split(separator)
-                elements = [float(element) for element in elements]
-
-                # Creating a one-hot vector of possible outputs:
                 hot_bit = [0]*number_of_classes
-                hot_bit[int(elements[-1]) + mod -1] = 1
+                classified = elements[-1]
+                elements = [float(element) for element in elements[:-1]]
 
+                if not self.casename == "iris":
+                    # Creating a one-hot vector of possible outputs:
+                    hot_bit[int(classified) + mod -1] = 1
+                else:
+                    iris_cases = {"Iris-setosa":0, "Iris-versicolor":1, "Iris-virginica":2 }
+                    hot_bit[iris_cases[classified]] = 1
                 # Zipping results.
                 cases += [[elements[:-1], hot_bit]]
                 del hot_bit
@@ -96,7 +102,6 @@ class CaseManager():
             if not normalize:
                 return cases
 
-            normalized = []
             max = 0
             for case in cases:
                 for number in case[0]:

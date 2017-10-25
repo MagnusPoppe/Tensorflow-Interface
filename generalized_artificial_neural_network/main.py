@@ -1,27 +1,30 @@
 import os
-
-import time
-
 import sys
+import json
 
 from generalized_artificial_neural_network.trainer import Trainer
 
 
+def mark_single_module(json:dict, coach):
+    coach.monitor_module(json["placement"], json["component"])
 def mark_the_selected_modules_for_monitoring(configuration, coach):
     """ Add a grabbed variable, or a variable that is taken
         out of the graph to be displayed.
         (to be displayed in its own matplotlib window).
      """
     for layer in configuration.map_layers:
-        coach.monitor_module(layer["placement"], layer["component"])
+        mark_single_module(layer, coach)
 
+def mark_single_proble(json:dict, coach):
+    coach.ann.generate_probe(
+        json["placement"],
+        json["component"],
+        (json["points_of_interest"][0], json["points_of_interest"][1]))
 def mark_the_selected_modules_for_probing(configuration, coach):
     """ Grabs a variable for use with tensorboard """
     for layer in configuration.probe_layers:
-        coach.ann.generate_probe(
-            layer["placement"],
-            layer["component"],
-            (layer["points_of_interest"][0], layer["points_of_interest"][1]))
+        mark_single_proble(layer, coach)
+
 
 def input_number(text:str) -> int:
     epochs = input("\t"+text)
@@ -37,6 +40,20 @@ def input_json_file(text:str="file: configurations/") -> str:
         print("\"" + file + "\" is no a json file!")
         epochs = input("\t"+text)
     return file
+
+def input_json(text:str) -> dict:
+    inn = input("\t"+text+"=")
+    not_valid_json=True
+    out = None
+    while not_valid_json:
+        try:
+            out = json.loads(inn)
+            not_valid_json=False
+        except Exception:
+            not_valid_json = True
+            print("\"" + inn + "\" is not json!")
+            inn = input("\t"+text+"=")
+    return out
 
 def create_artificial_neural_network_from_config_file(file) -> Trainer:
     configuration_file = os.path.join("configurations", file)
@@ -58,6 +75,7 @@ displaymode = True
 # "one-hot.json"
 # "parity.json"
 # "segment-counter.json"
+# "iris.json"
 file = "one-hot.json"
 coach = None
 for arg in sys.argv:
@@ -79,14 +97,19 @@ while run:
         # Visuals:
         if x in ["tb", "tensorboard"]: coach.run_tensorboard()
         # TODO: Display biases and weigths. check out display matrix in tftools. note, also imlement in config file
-        elif x in ["display hinton history", "dhh"]: coach.display_hinton_graph_from_training_history()
+        # elif x in ["display hinton history", "dhh"]: coach.visualizer.display_hinton_graph_from_training_history()
         elif x in ["mapping"]: coach.mapping(coach.config.manager.training_cases, input_number("map batch size="))
-        elif x in ["close windows", "close"]: coach.close_all_matplotlib_windows()
+        elif x in ["close windows", "close"]: coach.visualizer.close_all_matplotlib_windows()
 
         # Stats:
         elif x in ["info","settings", "i"]: coach.config.print_summary()
         elif x == "run more": coach.run_more(input_number("epochs="))
         elif x in "run tests": coach.run_all_tests(renew_session=True, in_top_k=True)
+
+        # Add module / probe:
+        elif x in ["add module"]: mark_single_module(input_json("Module-to-monitor"),coach)
+        elif x in ["add probe"]:  mark_single_module(input_json("Probe-to-monitor"),coach)
+
         else: print("Unknown command.")
     else: print("Unknown command.")
 

@@ -1,6 +1,6 @@
 {
    "network_configuration":{
-      "input_vector_size":9,
+      "input_vector_size":8,
       "optimizer":{
          "algorithm": "SGD",
          "learning_rate": 0.5,

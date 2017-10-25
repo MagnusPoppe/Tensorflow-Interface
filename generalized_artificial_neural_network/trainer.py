@@ -6,7 +6,7 @@ from numpy.core.multiarray import ndarray
 
 from generalized_artificial_neural_network.network import NeuralNetwork
 from generalized_artificial_neural_network.network_configuration import NetworkConfiguration
-
+from generalized_artificial_neural_network.visualizer import VisualizationAdapter
 
 
 class Trainer():
@@ -27,6 +27,7 @@ class Trainer():
         self.monitored_modules_history = []  # History. Each entry is a tuple of (epoch, error)
         self.probed_modules = None
         self.monitored_modules = []
+        self.visualizer = VisualizationAdapter(trainer=self)
 
         # This is a counter over how many cases has run through the network, total.
         self.steps = 0
@@ -34,8 +35,6 @@ class Trainer():
 
         # Graphics
         self.graph = None
-        self.hinton_figures = []     # list of matplotlib.pyplot.Figure
-        self.dendrogram_figures = [] # list of matplotlib.pyplot.Figure
 
     def run(self, epochs=None, display_graph:bool=True, hinton_plot:bool=False):
         if self.graph:
@@ -72,7 +71,7 @@ class Trainer():
         Trains the network on the casemanager training cases.
         :param epochs: Number of times to train on the whole set of cases
         """
-        if self.live_hinton_modules:  self._initialize_graphics()
+        if self.live_hinton_modules:  self.visualizer._initialize_graphics()
 
         # Getting the cases to run with:
         cases = self.config.manager.get_training_cases()
@@ -127,7 +126,7 @@ class Trainer():
                     # TODO: Implement other loss function as well. % incorrect cases.
                     self.graph.update(self.error_history, self.validation_history)
                 if self.live_hinton_modules:
-                    self.display_hinton_module(results[monitored], epoch)
+                    self.visualizer._draw_hinton_graph(results[monitored], epoch)
                 self._progress_print(epoch, error)
                 self.monitored_modules_history += [(epoch, results[monitored])]
 
@@ -144,6 +143,8 @@ class Trainer():
 
         # Selecting error function:
         if in_top_k:
+            if isinstance(target_vectors[0], ndarray):
+                target_vectors = [li.tolist() for li in target_vectors]
             labels = [ v.index(1) for v in target_vectors ]
             test_module = self._create_in_top_k_operator(self.ann.predictor, labels)
         else: test_module = self.ann.error
@@ -170,11 +171,11 @@ class Trainer():
         results = self.session.run( parameters, feed_dict=feeder_dictionary )
 
         # Drawing hinton plot:
-        self._draw_hinton_graph(results[2], number_of_cases)
+        self.visualizer._draw_hinton_graph(results[2], number_of_cases)
 
         # Drawing dendrograms:
         if number_of_cases > 1:
-            self._draw_dendrograms(features=results[2], labels=input_vectors)
+            self.visualizer._draw_dendrograms(features=results[2], labels=input_vectors)
 
         self._save_session_params(session=self.session)
         self._close_session(self.session)
@@ -209,47 +210,6 @@ class Trainer():
         NB! All modules are displayed using the hinton graph.
         """
         self.monitored_modules.append(self.ann.hidden_layers[module_index].get_variable(type))
-
-    def display_hinton_graph_from_training_history(self):
-        self._initialize_graphics()
-        from downing_code.tflowtools import hinton_plot
-        for history in self.monitored_modules_history:
-            self._draw_hinton_graph(history[1], history[0], hinton_plot)
-
-    def _draw_hinton_graph(self, graph_results, epoch, imported_method=None):
-        if not imported_method: from downing_code.tflowtools import hinton_plot
-        else: hinton_plot = imported_method
-        self._initialize_graphics()
-        if self.hinton_figures and graph_results:
-            # Local import to be able to run on server.
-            for i in range(len(self.monitored_modules)):
-                hinton_plot(
-                    matrix=graph_results[i],
-                    fig=self.hinton_figures[i],
-                    title=self.monitored_modules[i].name + " @ epoch=" + str(epoch))
-
-    def _draw_dendrograms(self, features, labels):
-        from downing_code.tflowtools import dendrogram
-        import matplotlib.pyplot as PLT
-        for i, monitored in enumerate(features):
-            module_name = self.monitored_modules[i].name
-
-            if any(word in module_name for word in ["in", "bias", "out"]):
-                self.dendrogram_figures.append(PLT.figure())
-                dendrogram(features=monitored, labels=labels, figure=self.dendrogram_figures[-1], title=module_name)
-
-    def _initialize_graphics(self):
-        """ Creates the list of "matplotlib.pyplot.Figure" to be used with the hinton diagrams. """
-        import matplotlib.pyplot as PLT
-        for i in range(len(self.monitored_modules)):
-            self.hinton_figures.append(PLT.figure())
-
-    def close_all_matplotlib_windows(self):
-        import matplotlib.pyplot as PLT
-        PLT.close('all')
-        self.hinton_figures = []
-        self.dendrogram_figures = []
-        self.graph = None
 
     def _progress_print(self, epoch, error):
         print("Epoch=" + "0"*(len(str(self.config.epochs)) - len(str(epoch))) + str(epoch) + "    "

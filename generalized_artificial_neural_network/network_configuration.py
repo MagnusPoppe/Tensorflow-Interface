@@ -29,7 +29,8 @@ class NetworkConfiguration:
         "mnist",
         "glass",
         "yeast",
-        "wine quality"
+        "wine quality",
+        "iris"
     ]
 
     def __init__(self, file=None):
@@ -65,7 +66,7 @@ class NetworkConfiguration:
         self.map_layers                 = input["visualisation"]["map_layers"]
         self.probe_layers               = input["visualisation"]["probe_layers"]
 
-        classes = input["dataset"]["number_of_classes"] if self.dataset in ["yeast", "glass", "wine quality"] else 0
+        classes = input["dataset"]["number_of_classes"] if self.dataset in ["yeast", "glass", "wine quality", "iris"] else 0
 
         if self.validation_interval == "half": self.validation_interval = self.epochs/2
 
