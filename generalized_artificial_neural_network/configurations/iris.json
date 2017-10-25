@@ -1,0 +1,37 @@
+{
+   "network_configuration":{
+      "input_vector_size":3,
+      "optimizer":{
+         "algorithm": "SGD",
+         "learning_rate": 0.6,
+         "locking": false
+      },
+      "hidden_activation":1,
+      "output_activation":4,
+      "network_dimensions":[ 10, 20, 3 ],
+      "cost_function":0,
+      "weight_range":{
+         "upper":  1,
+         "lower": -1
+      },
+      "validation_test_interval":100
+   },
+   "run_configuration":{
+      "in_top_k": true,
+      "mini-batch-size":25,
+      "epochs": 1500
+   },
+   "visualisation":{
+      "display_interval":100,
+      "map_layers":[],
+      "probe_layers": []
+   },
+   "dataset":{
+      "validation_fraction":0.1,
+      "test_fraction":0.1,
+      "name":"iris",
+      "normalize":true,
+      "total_case_fraction":1.0,
+      "number_of_classes":3
+   }
+}

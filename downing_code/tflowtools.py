@@ -386,7 +386,7 @@ def display_matrix(matrix,fig=None,trans=True,scale=True, title='Matrix',tform='
                   bbox=dict(facecolor=color,alpha=0.5,edgecolor='white'),ha='center',va='center',
                   color='black',size=tsize)
     axes.autoscale_view()
-    PLT.draw()
+    hfig.canvas.draw()
     PLT.pause(1)
 
 # ****** Principle Component Analysis (PCA) ********

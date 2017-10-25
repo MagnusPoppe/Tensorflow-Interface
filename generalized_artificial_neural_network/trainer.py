@@ -126,7 +126,7 @@ class Trainer():
                     # TODO: Implement other loss function as well. % incorrect cases.
                     self.graph.update(self.error_history, self.validation_history)
                 if self.live_hinton_modules:
-                    self.visualizer._draw_hinton_graph(results[monitored], epoch)
+                    self.visualizer._draw_hinton_graph(results[monitored], epoch, self.monitored_modules)
                 self._progress_print(epoch, error)
                 self.monitored_modules_history += [(epoch, results[monitored])]
 
@@ -171,11 +171,35 @@ class Trainer():
         results = self.session.run( parameters, feed_dict=feeder_dictionary )
 
         # Drawing hinton plot:
-        self.visualizer._draw_hinton_graph(results[2], number_of_cases)
+        self.visualizer._draw_hinton_graph(results[2], number_of_cases, self.monitored_modules)
 
         # Drawing dendrograms:
         if number_of_cases > 1:
             self.visualizer._draw_dendrograms(features=results[2], labels=input_vectors)
+
+        self._save_session_params(session=self.session)
+        self._close_session(self.session)
+
+    def display_weights_and_biases(self, layer=-1, number_of_cases=1, weights=False, biases=False):
+        self._reopen_current_session()
+        modules = []
+        if layer == -1:
+            if weights: modules += self.ann.retrieve_all_weights()
+            if biases:  modules += self.ann.retrieve_all_biases()
+        else:
+            if weights: modules += [ self.ann.hidden_layers[layer].weight_matrix ]
+            if biases:  modules += [ self.ann.hidden_layers[layer].bias_vector ]
+
+        cases = self.config.manager.training_cases
+        input_vectors = []
+        feeder_dictionary = self._convert_to_feeder_dictionary(cases[:number_of_cases], input_vectors=input_vectors)
+
+        # Setting the parameters for the session.run.
+        parameters = [self.ann.error, self.ann.predictor, modules]
+        results = self.session.run( parameters, feed_dict=feeder_dictionary )
+
+        # self.visualizer._draw_hinton_graph(results[2], number_of_cases, modules)
+        self.visualizer.display_matrix(modules, results[2])
 
         self._save_session_params(session=self.session)
         self._close_session(self.session)
@@ -219,6 +243,9 @@ class Trainer():
     def _create_in_top_k_operator(self, logits, labels, k=1):
         correct = tf.nn.in_top_k(tf.cast(logits,tf.float32), labels, k) # Return number of correct outputs
         return tf.reduce_sum(tf.cast(correct, tf.int32))
+
+    # TODO: Separate all session handling into external class SessionHandler.
+    # TODO: implement saving sessions.
 
     def _create_session(self, directory='probeview') -> tf.Session:
         # Clearing the output folders for previous output:

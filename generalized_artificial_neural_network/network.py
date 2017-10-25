@@ -95,3 +95,8 @@ class NeuralNetwork:
     def generate_probe(self, module_index, type, spec):
         """ Probed variables are to be displayed in the Tensorboard. """
         self.hidden_layers[module_index].generate_probe(type,spec)
+
+    def retrieve_all_weights(self):
+        return [layer.weight_matrix for layer in self.hidden_layers]
+    def retrieve_all_biases(self):
+        return [layer.bias_vector for layer in self.hidden_layers]

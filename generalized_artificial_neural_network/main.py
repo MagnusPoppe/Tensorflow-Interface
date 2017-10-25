@@ -99,6 +99,9 @@ while run:
         # TODO: Display biases and weigths. check out display matrix in tftools. note, also imlement in config file
         # elif x in ["display hinton history", "dhh"]: coach.visualizer.display_hinton_graph_from_training_history()
         elif x in ["mapping"]: coach.mapping(coach.config.manager.training_cases, input_number("map batch size="))
+        elif x in ["display weights"]: coach.display_weights_and_biases(weights=True)
+        elif x in ["display biases"]: coach.display_weights_and_biases(biases=True)
+        elif x in ["display weights and biases"]: coach.display_weights_and_biases(weights=True, biases=True)
         elif x in ["close windows", "close"]: coach.visualizer.close_all_matplotlib_windows()
 
         # Stats:
