@@ -1,17 +1,18 @@
 {
    "network_configuration":{
-      "input_vector_size": 11,
+      "input_vector_size": 10,
       "optimizer": {
-         "algorithm": "MOMENTUM",
-         "learning_rate":0.3,
-         "momentum": 0.5,
-         "locking": false,
-         "use_nestrov": false
+         "algorithm": "ADAM",
+         "learning_rate":0.00003275,
+         "Beta1 (exponential decay rate for the 1st moment estimates)": 0.500,
+         "Beta2 (exponential decay rate for the 2st moment estimates)": 0.999,
+         "epsilon": 1e-08,
+         "locking": false
       },
       "hidden_activation":1,
-      "validation_test_interval":100,
-      "output_activation": 0,
-      "network_dimensions":[ 90, 50, 25, 6 ],
+      "validation_test_interval":25,
+      "output_activation": 4,
+      "network_dimensions":[ 200, 60, 175, 6 ],
       "cost_function": 0,
       "weight_range":{
          "upper": 1,
@@ -19,15 +20,12 @@
       }
    },
    "run_configuration":{
-      "map-batch-size":10,
-      "mini-batch-size":750,
-      "epochs": 300
+      "in_top_k":true,
+      "mini-batch-size":250,
+      "epochs": 7500
    },
    "visualisation":{
-      "display_biases":false,
-      "display_weights":false,
-      "map_dendrograms":false,
-      "display_interval":100,
+      "display_interval":25,
       "map_layers":[
          {
             "placement": 2,
@@ -52,7 +50,6 @@
    },
    "dataset":{
       "validation_fraction": 0.2,
-      "steps_per_minibatch": 1,
       "test_fraction": 0.2,
       "name":"wine quality",
       "normalize": true,

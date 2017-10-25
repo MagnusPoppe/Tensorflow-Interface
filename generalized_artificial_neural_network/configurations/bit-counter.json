@@ -3,7 +3,7 @@
       "input_vector_size": 15,
       "optimizer": {
          "algorithm": "SGD",
-         "learning_rate": 0.6,
+         "learning_rate": 0.5,
          "locking": false
       },
       "hidden_activation":1,
@@ -18,13 +18,10 @@
    },
    "run_configuration":{
       "in_top_k": true,
-      "mini-batch-size": 20,
-      "epochs": 4000
+      "mini-batch-size":15,
+      "epochs": 3000
    },
    "visualisation":{
-      "display_biases":false,
-      "display_weights":false,
-      "map_dendrograms":false,
       "display_interval":100,
       "map_layers":[],
       "probe_layers":[ {
@@ -36,9 +33,8 @@
       ]
    },
    "dataset":{
-      "validation_fraction":0.2,
-      "steps_per_minibatch":0,
-      "test_fraction":0.2,
+      "validation_fraction":0.1,
+      "test_fraction":0.1,
       "name":"bit-counter",
       "total_case_fraction":1.0
    }

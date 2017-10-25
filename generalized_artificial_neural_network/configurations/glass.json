@@ -1,15 +1,18 @@
 {
    "network_configuration":{
       "input_vector_size":8,
-      "optimizer":{
-         "algorithm": "SGD",
-         "learning_rate": 0.5,
+      "optimizer": {
+         "algorithm": "ADAM",
+         "learning_rate":0.0075,
+         "Beta1 (exponential decay rate for the 1st moment estimates)": 0.9,
+         "Beta2 (exponential decay rate for the 2st moment estimates)": 0.999,
+         "epsilon": 1e-08,
          "locking": false
       },
       "hidden_activation": 1,
-      "output_activation": 0,
-      "network_dimensions":[ 200, 50, 25, 6 ],
-      "validation_test_interval":50,
+      "output_activation": 3,
+      "network_dimensions":[ 70, 50, 40, 6 ],
+      "validation_test_interval":100,
       "cost_function":0,
       "weight_range":{
          "upper": 0.5,
@@ -19,10 +22,10 @@
    "run_configuration":{
       "in_top_k":true,
       "mini-batch-size": 50,
-      "epochs": 2500
+      "epochs": 10000
    },
    "visualisation":{
-      "display_interval":50,
+      "display_interval":1000,
       "map_layers":[],
       "probe_layers": []
    },

@@ -66,7 +66,7 @@ class Trainer():
         self._reopen_current_session()
         self.run(epochs, display_graph, hinton_plot)
 
-    def train(self,epochs):
+    def train(self,epochs, average_error=False, live_training_accuracy=True):
         """
         Trains the network on the casemanager training cases.
         :param epochs: Number of times to train on the whole set of cases
@@ -113,12 +113,13 @@ class Trainer():
                 self.steps += 1
 
             # Updating error history for the graph:
+            error = error / int(len(cases)/self.config.mini_batch_size) if average_error else error
             self.error_history.append((epoch+self.epochs_trained_on, error))
 
             # Perform validation test if interval:
             if epoch % self.config.validation_interval == 0:
-                self.validation_history += [(epoch+self.epochs_trained_on,
-                                             self.test(cases=self.config.manager.get_validation_cases()))]
+                valid_error, valid_accuracy = self.test(cases=self.config.manager.get_validation_cases(), both=True)
+                self.validation_history += [(epoch+self.epochs_trained_on, valid_error)]
 
             # Printing status update:
             if epoch % self.config.display_interval == 0:
@@ -127,14 +128,19 @@ class Trainer():
                     self.graph.update(self.error_history, self.validation_history)
                 if self.live_hinton_modules:
                     self.visualizer._draw_hinton_graph(results[monitored], epoch, self.monitored_modules)
-                self._progress_print(epoch, error)
+
+                # Should turn this off for performance.
+                if live_training_accuracy: test_accuracy = self.test(cases=cases, in_top_k=True)
+                else: test_accuracy = None
+
+                self._progress_print(epoch, error, valid_accuracy, test_accuracy)
                 self.monitored_modules_history += [(epoch, results[monitored])]
 
         self.epochs_trained_on += epochs
         print("\nTRAINING COMPLETE!")
         print("\tERROR AFTER TRAINING: " + str(self.error_history[-1][1]))
 
-    def test(self, cases:list, renew_session=False, in_top_k=False):
+    def test(self, cases:list, renew_session=False, in_top_k=False, both=False):
         if renew_session: self._reopen_current_session()
         # Loading up all data into the feeder dictionary. That way only one call to
         # session.run() is needed for entire test. This is faster.
@@ -142,19 +148,22 @@ class Trainer():
         feeder_dictionary = self._convert_to_feeder_dictionary(cases, target_vectors=target_vectors)
 
         # Selecting error function:
-        if in_top_k:
+        if in_top_k or both:
             if isinstance(target_vectors[0], ndarray):
                 target_vectors = [li.tolist() for li in target_vectors]
             labels = [ v.index(1) for v in target_vectors ]
-            test_module = self._create_in_top_k_operator(self.ann.predictor, labels)
-        else: test_module = self.ann.error
+            test_module = [self._create_in_top_k_operator(self.ann.predictor, labels)]
+
+        else: test_module = [self.ann.error]
+        if both: test_module += [self.ann.error]
 
         # Setting the parameters for the session.run.
-        parameters = [test_module, self.ann.predictor]
+        parameters = test_module + [self.ann.predictor]
 
         # Actually running:
         results = self.session.run( parameters, feed_dict=feeder_dictionary )
         if in_top_k: return 100*(results[0] /len(cases))  # results[1] is error. Scaling to fit.
+        elif both:   return results[1], 100*(results[0] /len(cases))
         else:        return results[0]               # results[1] is error
 
     def mapping(self, cases, number_of_cases=10):
@@ -235,10 +244,14 @@ class Trainer():
         """
         self.monitored_modules.append(self.ann.hidden_layers[module_index].get_variable(type))
 
-    def _progress_print(self, epoch, error):
-        print("Epoch=" + "0"*(len(str(self.config.epochs)) - len(str(epoch))) + str(epoch) + "    "
-              "Error=" + str(error) + "    "
-              "Validation=" + (str(self.validation_history[-1][1]) if self.validation_history else "0"))
+    def _progress_print(self, epoch, error, valid_accurracy=None, test_accurracy=None):
+        output = "Epoch=" + "0"*(len(str(self.config.epochs)) - len(str(epoch))) + str(epoch) + "    " \
+                 "Error=" + str(error) + "    " \
+                 "Validation error=" + (str(self.validation_history[-1][1]) if self.validation_history else "0")
+
+        if valid_accurracy and test_accurracy:
+            output += "    Validation accuracy="+str(valid_accurracy)+"%    Training Accuracy="+str(test_accurracy)+"%"
+        print(output)
 
     def _create_in_top_k_operator(self, logits, labels, k=1):
         correct = tf.nn.in_top_k(tf.cast(logits,tf.float32), labels, k) # Return number of correct outputs

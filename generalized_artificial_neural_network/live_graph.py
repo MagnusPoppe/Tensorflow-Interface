@@ -2,13 +2,14 @@ import matplotlib.pyplot as PLT
 
 class LiveGraph():
 
-    def __init__(self, graph_title, x_title="", y_title="", epochs=5):
+    def __init__(self, graph_title, x_title="", y_title="", epochs=5, y_limit=1):
         self.figure = PLT.figure()
         self.figure.suptitle(graph_title)
         PLT.xlabel(x_title)
         PLT.ylabel(y_title)
         PLT.xlim([0, epochs])
-        PLT.ylim([0, 1])
+        if y_limit:
+            PLT.ylim([0, y_limit])
         PLT.grid()
         self.error_graph = None
         self.validation_graph = None

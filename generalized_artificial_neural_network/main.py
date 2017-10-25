@@ -68,7 +68,7 @@ def create_and_run(file, displaymode):
     # coach.mapping(coach.config.manager.training_cases, number_of_cases=10)
     return coach
 
-## Setup:
+### Setup:
 displaymode = True
 
 #### TRAINED CASES:
@@ -76,7 +76,10 @@ displaymode = True
 # "parity.json"
 # "segment-counter.json"
 # "iris.json"
-file = "yeast.json"
+# "yeast.json" - ustabil
+# "glass.json" - noe ustabil. 90 % < x < 98 % + 10 epoker kan gi mange ekstra prosent.
+# "bit-counter.json"
+file = "bit-counter.json"
 coach = None
 for arg in sys.argv:
     if arg in ["-r", "remote"]: displaymode=False
