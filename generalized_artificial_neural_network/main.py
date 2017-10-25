@@ -57,7 +57,8 @@ displaymode = True
 #### TRAINED CASES:
 # "one-hot.json"
 # "parity.json"
-file =  "segment-counter.json"# "winequality.json" # "bit-counter.json"  # "glass.json" #
+# "segment-counter.json"
+file = "glass.json"
 coach = None
 for arg in sys.argv:
     if arg in ["-r", "remote"]: displaymode=False

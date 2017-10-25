@@ -28,6 +28,10 @@ class Trainer():
         self.probed_modules = None
         self.monitored_modules = []
 
+        # This is a counter over how many cases has run through the network, total.
+        self.steps = 0
+        self.epochs_trained_on = 0
+
         # Graphics
         self.graph = None
         self.hinton_figures = []     # list of matplotlib.pyplot.Figure
@@ -42,7 +46,10 @@ class Trainer():
 
         if display_graph:
             from generalized_artificial_neural_network.live_graph import LiveGraph
-            self.graph = LiveGraph(graph_title="Error", x_title="Epochs", y_title="Error", epochs=epochs)
+            self.graph = LiveGraph(graph_title="Error",
+                                   x_title="Epochs",
+                                   y_title="Error",
+                                   epochs=epochs+self.epochs_trained_on)
 
         self.live_hinton_modules = hinton_plot
 
@@ -60,15 +67,12 @@ class Trainer():
         self._reopen_current_session()
         self.run(epochs, display_graph, hinton_plot)
 
-    def train(self, epochs):
+    def train(self,epochs):
         """
         Trains the network on the casemanager training cases.
         :param epochs: Number of times to train on the whole set of cases
         """
         if self.live_hinton_modules:  self._initialize_graphics()
-
-        # This is a counter over how many cases has run through the network, total.
-        steps = 0
 
         # Getting the cases to run with:
         cases = self.config.manager.get_training_cases()
@@ -107,14 +111,15 @@ class Trainer():
 
                 # Updating variables:
                 error += results[err]
-                steps += 1
+                self.steps += 1
 
             # Updating error history for the graph:
-            self.error_history.append((epoch, error))
+            self.error_history.append((epoch+self.epochs_trained_on, error))
 
             # Perform validation test if interval:
             if epoch % self.config.validation_interval == 0:
-                self.validation_history += [(epoch, self.test(cases=self.config.manager.get_validation_cases()))]
+                self.validation_history += [(epoch+self.epochs_trained_on,
+                                             self.test(cases=self.config.manager.get_validation_cases()))]
 
             # Printing status update:
             if epoch % self.config.display_interval == 0:
@@ -125,6 +130,8 @@ class Trainer():
                     self.display_hinton_module(results[monitored], epoch)
                 self._progress_print(epoch, error)
                 self.monitored_modules_history += [(epoch, results[monitored])]
+
+        self.epochs_trained_on += epochs
         print("\nTRAINING COMPLETE!")
         print("\tERROR AFTER TRAINING: " + str(self.error_history[-1][1]))
 
