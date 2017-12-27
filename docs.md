@@ -1,6 +1,7 @@
 # Tips for bedre konfigurere nettet
 
 1. Ved grunne nett (få lag) er det ofte lurt å velge mellom _sigmoid_ eller eller _hyperbolic tangent_. Det er viktig å merke seg at _sigmoid_ funksjonen har veldig mye dårlige egenskaper når det kommer til dype nett. Hovedsakelig er de dårlige egenskapene hvor lang tid det tar å beregne og hvordan gradientverdiene blir dårligere over tid. Vektene burde konfigureres etter tabellen under.
+
 |function          |lower|upper|
 |------------------|:---:|:---:|
 |Sigmoid           |    0|    1|
